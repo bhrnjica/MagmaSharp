@@ -10,6 +10,8 @@ C# implementation of Magma - linear algebra library for for hybrid manycore and 
 # How to Build MagmaSharp from the source
 
 1. Download Intel MKL Math library from the official site and install it to default location: C:/Program Files (x86)/IntelSWTools
-2. Build Magma library and copy it to you local development environment at (c:/Libs/Magmav2.2.0/)
+2. Build Magma library and copy it to you local development environment at (MagmaSharp/MagmaLib)
 ![Magma runtime location](img/magma_lib_location.jpg)
-3. Open 'MagmaSharp.Sln' with Visual Studio 2019 and build it.
+3. Open 'MagmaSharp.Sln' with Visual Studio 2019.
+4. Make SUre the building architecture is x64.
+5. Build the Solution.
