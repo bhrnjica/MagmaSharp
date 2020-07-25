@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MagmaSharp.TestApp": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+    <metadata>
+        <id>MagmaSharp</id>
+        <version>0.01.7</version>
+        <authors>Bahrudin Hrnjica,</authors>
+        <owners>bhrnjica</owners>
+        <projectUrl>https://github.com/bhrnjica/MagmaSharp</projectUrl>
+		<repository type="git" url="https://github.com/bhrnjica/magmasharp.git" />
+		<license type="expression">MIT</license>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <releaseNotes>Initial release for MagmaSharp.</releaseNotes>
+		<title>MagmaSharp - High level API for MAGMA.</title>
+        <description>MagmaSharp - High level API for MAGMA.</description>
+		<summary>MagmaSharp - High level API for MAGMA.</summary >
+        <copyright>Copyright ©2019-2020 Bahrudin Hrnjica</copyright>
+        <tags>magma, linear algebra</tags>
+        <dependencies>
+			<group targetFramework=".NETStandard2.0" />		 
+        </dependencies>
+    </metadata>
+    <!-- A readme.txt to display when the package is installed <file src="daanyIcon.png"/> -->
+    <files>
+        <file src="README.MD"/>	
+		<file src="LICENSE"/>
+		<file src="MagmaSharp/bin/x64/Release/netstandard2.0/MagmaSharp.dll" target="lib/netstandard2.0" />
+		<file src="lib/Magmav2Binding.dll" target="lib/netstandard2.0" />
+		<file src="lib/LapackBinding.dll" target="lib/netstandard2.0" />
+		<file src="lib/mkl_def.dll" target="lib/netstandard2.0" />
+		<file src="lib/mkl_avx2.dll" target="lib/netstandard2.0" />
+		<file src="lib/mkl_core.dll" target="lib/netstandard2.0" />
+		<file src="lib/mkl_intel_thread.dll" target="lib/netstandard2.0" />
+    </files>
+</package>
