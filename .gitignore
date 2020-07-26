@@ -69,3 +69,7 @@
 /src/cpp/MagmaWndTest/x64/Debug
 /test/MagmaSharp.XUnit/bin
 /test/MagmaSharp.XUnit/obj
+/src/cpp/LapackBinding/x64/Release
+/src/cpp/Magmav2Binding/x64/Release
+/src/cpp/MagmaWndTest/x64/Release
+/nuget/MagmaSharp.0.1.10.nupkg
