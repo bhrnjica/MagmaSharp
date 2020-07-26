@@ -135,7 +135,7 @@
     </Link>
     <PostBuildEvent>
       <Command> xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)src/.net/MagmaSharp.TestApp\bin\x64\$(Configuration)\netcoreapp3.1"
- xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)src/.net/MagmaSharp.XUnit\bin\x64\$(Configuration)\netcoreapp3.1"
+ xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)test/MagmaSharp.XUnit\bin\x64\$(Configuration)\netcoreapp3.1"
 copy  /Y "$(TargetPath)" "$(SolutionDir)lib\LapackBinding.dll"
       </Command>
     </PostBuildEvent>
@@ -163,7 +163,7 @@ copy  /Y "$(TargetPath)" "$(SolutionDir)lib\LapackBinding.dll"
     </Link>
     <PostBuildEvent>
       <Command> xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)src/.net/MagmaSharp.TestApp\bin\x64\$(Configuration)\netcoreapp3.1"
- xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)src/.net/MagmaSharp.XUnit\bin\x64\$(Configuration)\netcoreapp3.1"
+ xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)test/MagmaSharp.XUnit\bin\x64\$(Configuration)\netcoreapp3.1"
 copy  /Y "$(TargetPath)" "$(SolutionDir)lib\LapackBinding.dll"
       </Command>
     </PostBuildEvent>

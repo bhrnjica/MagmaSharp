@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "MagmaSharp.XUnit": {
+      "commandName": "Project"
+    }
+  }
+}

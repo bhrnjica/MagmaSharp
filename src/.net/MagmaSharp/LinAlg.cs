@@ -448,8 +448,8 @@ namespace MagmaSharp
             //back the array from native to managed
             //var aa = Util.FromNativeToSArray(a, Af.Length);
             var S = Util.FromNativeToSArray(s, n);
-            var U = Util.FromNativeToSArray(u, m, n, m);
-            var VT = Util.FromNativeToSArray(vt, n, n, m);
+            var U = Util.FromNativeToSArray(u, m, m, m);
+            var VT = Util.FromNativeToSArray(vt, n, n, n);
 
             ////Free memory
             Marshal.FreeHGlobal(a);
@@ -499,8 +499,8 @@ namespace MagmaSharp
 
             //back the array from native to managed
             var S = Util.FromNativeToDArray(s, n);
-            var U = Util.FromNativeToDArray(u, m, n, m);
-            var VT = Util.FromNativeToDArray(vt, n, n, m);
+            var U = Util.FromNativeToDArray(u, m, m, m);
+            var VT = Util.FromNativeToDArray(vt, n, n, n);
 
             ////Free memory
             Marshal.FreeHGlobal(s);

@@ -3,10 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Platforms>AnyCPU;x64</Platforms>
-    <Version>0.01.1</Version>
+    <Version>0.02.1</Version>
     <Authors>Bahrudin Hrnjica</Authors>
     <Company>bhrnjica</Company>
     <Copyright>2020</Copyright>
+    <Description>High level API for Magma linear Algebra on GPU.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
