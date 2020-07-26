@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
     <metadata>
         <id>MagmaSharp</id>
-        <version>0.01.7</version>
+        <version>0.01.10</version>
         <authors>Bahrudin Hrnjica,</authors>
         <owners>bhrnjica</owners>
         <projectUrl>https://github.com/bhrnjica/MagmaSharp</projectUrl>
@@ -23,7 +23,7 @@
     <files>
         <file src="README.MD"/>	
 		<file src="LICENSE"/>
-		<file src="MagmaSharp/bin/x64/Release/netstandard2.0/MagmaSharp.dll" target="lib/netstandard2.0" />
+		<file src="src/.net/MagmaSharp/bin/x64/Release/netstandard2.0/MagmaSharp.dll" target="lib/netstandard2.0" />
 		<file src="lib/Magmav2Binding.dll" target="lib/netstandard2.0" />
 		<file src="lib/LapackBinding.dll" target="lib/netstandard2.0" />
 		<file src="lib/mkl_def.dll" target="lib/netstandard2.0" />
