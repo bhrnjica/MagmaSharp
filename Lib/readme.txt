@@ -6,8 +6,7 @@ Intel MKL Math library have to be installed on your machine.You can download it 
 https://software.intel.com/content/www/us/en/develop/tools/math-kernel-library/choose-download.html
 required dlls are copied here during the build process.
 
-Dlls which are crated during buildprocess:
+Dlls which are created during buildprocess:
 
 2. Magmav2Binding.dll
 3. LapackBinding.dll
-4. MagmaSharp.dll

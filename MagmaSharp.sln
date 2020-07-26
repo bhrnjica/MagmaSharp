@@ -27,8 +27,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagmaSharp", "src\.net\Magm
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagmaSharp.TestApp", "src\.net\MagmaSharp.TestApp\MagmaSharp.TestApp.csproj", "{112C84F2-EB66-4027-85B1-8FDA7A7CC919}"
+	ProjectSection(ProjectDependencies) = postProject
+		{47AF221E-5578-49FE-A144-B51B1117C894} = {47AF221E-5578-49FE-A144-B51B1117C894}
+		{6F92D549-54A9-4950-84C7-BFBCC349735E} = {6F92D549-54A9-4950-84C7-BFBCC349735E}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MagmaSharp.XUnit", "test\MagmaSharp.XUnit\MagmaSharp.XUnit.csproj", "{0A0EC240-2462-40A4-BBF9-B0A4C441E580}"
+	ProjectSection(ProjectDependencies) = postProject
+		{47AF221E-5578-49FE-A144-B51B1117C894} = {47AF221E-5578-49FE-A144-B51B1117C894}
+		{6F92D549-54A9-4950-84C7-BFBCC349735E} = {6F92D549-54A9-4950-84C7-BFBCC349735E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

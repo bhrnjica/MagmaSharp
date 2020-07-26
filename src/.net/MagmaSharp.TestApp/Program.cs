@@ -9,7 +9,7 @@ namespace MagmaSharp.TestApp
         static void Main(string[] args)
         {
 
-            foreach (var i in Enumerable.Range(0,100))
+           // foreach (var i in Enumerable.Range(0,100))
                 TestSvdFloat(); //TestFloat();
 
             return;

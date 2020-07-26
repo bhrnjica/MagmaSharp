@@ -134,8 +134,8 @@
       <AdditionalDependencies>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\intel64_win\mkl_intel_lp64_dll.lib;C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\compiler\lib\intel64_win\libiomp5md.lib;C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\intel64_win\mkl_intel_thread_dll.lib;C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\intel64_win\mkl_core_dll.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command> xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)MagmaSharp.TestApp\bin\x64\$(Configuration)\netcoreapp3.1"
- xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)MagmaSharp.XUnit\bin\x64\$(Configuration)\netcoreapp3.1"
+      <Command> xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)src\.net\MagmaSharp.TestApp\bin\x64\$(Configuration)\netcoreapp3.1"
+ xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)src\.net\MagmaSharp.XUnit\bin\x64\$(Configuration)\netcoreapp3.1"
 copy  /Y "$(TargetPath)" "$(SolutionDir)lib\LapackBinding.dll"
       </Command>
     </PostBuildEvent>
@@ -162,8 +162,8 @@ copy  /Y "$(TargetPath)" "$(SolutionDir)lib\LapackBinding.dll"
       <AdditionalDependencies>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\intel64_win\mkl_intel_lp64_dll.lib;C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\compiler\lib\intel64_win\libiomp5md.lib;C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\intel64_win\mkl_intel_thread_dll.lib;C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\intel64_win\mkl_core_dll.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command> xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)MagmaSharp.TestApp\bin\x64\$(Configuration)\netcoreapp3.1"
- xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)MagmaSharp.XUnit\bin\x64\$(Configuration)\netcoreapp3.1"
+      <Command> xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)src\.net\MagmaSharp.TestApp\bin\x64\$(Configuration)\netcoreapp3.1"
+ xcopy /E /Y "$(ProjectDir)x64\$(Configuration)" "$(SolutionDir)src\.net\MagmaSharp.XUnit\bin\x64\$(Configuration)\netcoreapp3.1"
 copy  /Y "$(TargetPath)" "$(SolutionDir)lib\LapackBinding.dll"
       </Command>
     </PostBuildEvent>
