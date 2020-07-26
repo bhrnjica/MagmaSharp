@@ -9,6 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="intelmkl.redist.win-x64" Version="2020.2.254" />
+    <PackageReference Include="intelopenmp.redist.win" Version="2020.2.254" />
+    <PackageReference Include="inteltbb.redist.win" Version="2020.3.254" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.2">
@@ -26,7 +29,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy  /Y  &quot;$(SolutionDir)lib\Magmav2Binding.dll&quot; &quot;$(OutDir)Magmav2Binding.dll&quot;&#xD;&#xA;copy  /Y  &quot;$(SolutionDir)lib\LapackBinding.dll&quot;  &quot;$(OutDir)LapackBinding.dll&quot;&#xD;&#xA;&#xD;&#xA;copy /Y &quot;$(SolutionDir)lib\mkl_avx2.dll&quot; &quot;$(OutDir)mkl_avx2.dll&quot;&#xD;&#xA;copy /Y &quot;$(SolutionDir)lib\mkl_core.dll&quot; &quot;$(OutDir)mkl_core.dll&quot;&#xD;&#xA;copy /Y &quot;$(SolutionDir)lib\mkl_intel_thread.dll&quot; &quot;$(OutDir)mkl_intel_thread.dll&quot;&#xD;&#xA;copy /Y &quot;$(SolutionDir)lib\mkl_def.dll&quot; &quot;$(OutDir)mkl_def.dll&quot;" />
+    <Exec Command="copy  /Y  &quot;$(SolutionDir)lib\Magmav2Binding.dll&quot; &quot;$(OutDir)runtimes\win-$(PlatformName)\native\Magmav2Binding.dll&quot;&#xD;&#xA;copy  /Y  &quot;$(SolutionDir)lib\LapackBinding.dll&quot;  &quot;$(OutDir)runtimes\win-$(PlatformName)\native\LapackBinding.dll&quot;&#xD;&#xA;" />
   </Target>
 
 </Project>
