@@ -8,10 +8,11 @@ namespace MagmaSharp.TestApp
     {
         static void Main(string[] args)
         {
+            performanceTest();
           //  TestFloat();
 
            // foreach (var i in Enumerable.Range(0,100))
-                TestSvdFloat(); //TestFloat();
+                //TestSvdFloat(); //TestFloat();
 
             return;
             
@@ -26,6 +27,42 @@ namespace MagmaSharp.TestApp
 
            // solve();
            // Console.WriteLine("Hello World!");
+        }
+
+        private static void performanceTest()
+        {
+            LinAlg.init();
+            //The maximum matrix rank where managed method is faster than native is m=250
+            int n = 6000;
+            int m = 6000;
+            //From 350 to 750 CPU lapack methid is faster than Magma method
+
+            Console.WriteLine($"SVD for Matrix({m},{n})");
+            var rndMatrix = Daany.nc.Rand(m, n);
+            var matrix = new float[m, n];
+            var matrix0 = new float[m, n];
+            var matrix1 = new double[m, n];
+            int k = 0;
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    var v = rndMatrix[k++];
+                    matrix[i, j] = Convert.ToSingle(v);
+                    matrix1[i, j] = Convert.ToDouble(v);
+                }
+            }
+            Stopwatch sw = Stopwatch.StartNew();
+            var svs = MagmaSharp.LinAlg.Svd(matrix, Device.CUSTOM);
+            Console.WriteLine($"LAPACK Execution time:{sw.Elapsed.TotalSeconds} s.");
+            sw.Restart();
+            var svs0 = MagmaSharp.LinAlg.Svd(matrix, Device.GPU);
+            Console.WriteLine($"MAGMA Execution time:{sw.Elapsed.TotalSeconds} s.");
+            sw.Restart();
+            return;
+            var svdd = new Accord.Math.Decompositions.SingularValueDecomposition(matrix1);
+            Console.WriteLine($"Accord Execution time:{sw.Elapsed.TotalSeconds} s.");
+
         }
 
         public static void TestFloat()

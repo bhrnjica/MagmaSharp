@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
     <metadata>
         <id>MagmaSharp</id>
-        <version>0.01.16</version>
+        <version>0.01.17</version>
         <authors>Bahrudin Hrnjica,</authors>
         <owners>bhrnjica</owners>
         <projectUrl>https://github.com/bhrnjica/MagmaSharp</projectUrl>
@@ -10,11 +10,11 @@
 		<license type="expression">MIT</license>
         <requireLicenseAcceptance>true</requireLicenseAcceptance>
         <releaseNotes>Initial release for MagmaSharp.</releaseNotes>
-		<title>MagmaSharp - High level API for MAGMA.</title>
-        <description>MagmaSharp - High level API for MAGMA.</description>
+		<title>MagmaSharp - .NET High level API for MAGMA and Lapack.</title>
+        <description>MagmaSharp - .NET High level API for MAGMA and Lapack.</description>
 		<summary>MagmaSharp - High level API for MAGMA.</summary >
-        <copyright>Copyright ©2019-2020 Bahrudin Hrnjica</copyright>
-        <tags>magma, linear algebra</tags>
+        <copyright>Copyright ©2020 Bahrudin Hrnjica</copyright>
+        <tags>magma, lapack, linear algebra</tags>
         <dependencies>
 			<group targetFramework=".NETStandard2.0" >
 				<dependency id="intelopenmp.redist.win" version="2020.2.254" />

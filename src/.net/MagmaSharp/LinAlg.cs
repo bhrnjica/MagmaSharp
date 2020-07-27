@@ -36,8 +36,13 @@ namespace MagmaSharp
                 _device = Device.CPU;
 
             }
-           
+
         }
+
+        /// <summary>
+        /// Dummy method to be called first 
+        /// </summary>
+        public static void init(){;}
 
         #region Solver- solver of system of linear equations
         // 
