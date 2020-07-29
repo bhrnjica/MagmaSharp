@@ -26,21 +26,19 @@ namespace MagmaBinding
 	
 	
 	//AX=B - solver
-	extern "C" MAGMABINDINGS_API int mbv2sgesv(int n, int nrhs, float* A, int lda, int* ipiv, float* B, int lbd);
-	extern "C" MAGMABINDINGS_API int mbv2sgesv_gpu(int n, int nrhs, float* A, int lda, int* ipiv, float* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2sgesv(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int ldb);
+	extern "C" MAGMABINDINGS_API int mbv2sgesv_gpu(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int lbd);
 	//double
-	extern "C" MAGMABINDINGS_API int mbv2dgesv(int n, int nrhs, double* A, int lda, int* ipiv, double* B, int lbd);
-	extern "C" MAGMABINDINGS_API int mbv2dgesv_gpu(int n, int nrhs, double* A, int lda, int* ipiv, double* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2dgesv(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2dgesv_gpu(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int lbd);
 
 	//SVD
-	extern "C" MAGMABINDINGS_API int mbv2sgesvds(int m, int n, float* A, float* s, float* U, float* VT);
-	extern "C" MAGMABINDINGS_API int mbv2sgesvd(mbv2vector jobu, mbv2vector jobv, int m, int n,
-		float* A, int lda, float* s, float* U, int ldu, float* VT, int ldvt);
+	extern "C" MAGMABINDINGS_API int mbv2sgesvds(bool rowmajor, int m, int n, float* A, float* s, float* U, bool calcU, float* VT, bool calcV);
+	extern "C" MAGMABINDINGS_API int mbv2sgesvd(bool rowmajor, mbv2vector jobu, mbv2vector jobv, int m, int n, float* A, int lda, float* s, float* U, int ldu, float* VT, int ldvt);
 
 	//SVD
-	extern "C" MAGMABINDINGS_API int mbv2dgesvds(int m, int n, double* A, double* s, double* U, double* VT);
-	extern "C" MAGMABINDINGS_API int mbv2dgesvd(mbv2vector jobu, mbv2vector jobv, int m, int n,
-		double* A, int lda, double* s, double* U, int ldu, double* VT, int ldvt);
+	extern "C" MAGMABINDINGS_API int mbv2dgesvds(bool rowmajor, int m, int n, double* A, double* s, double* U, bool calcU, double* VT, bool calcV);
+	extern "C" MAGMABINDINGS_API int mbv2dgesvd(bool rowmajor, mbv2vector jobu, mbv2vector jobv, int m, int n, double* A, int lda, double* s, double* U, int ldu, double* VT, int ldvt);
 
 
 	//LSS - least squares solver

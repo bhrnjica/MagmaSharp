@@ -50,7 +50,7 @@ void mv2dgesvds_cpu_test()
 	printf("mbv2dgesvds_cpu test\n");
 
 	/* Compute SVD */
-	info = mbv2dgesvds_cpu( m, n, a, s, u, vt);
+	info = mbv2dgesvds_cpu(true, m, n, a, s, u, true, vt, true);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -111,7 +111,7 @@ void mv2dgesvd_cpu_test()
 	printf("mbv2dgesvd_cpu test\n");
 
 	/* Compute SVD */
-	info = mbv2dgesvd_cpu(jobU, jobV, m, n, a, lda, s, u, ldu, vt, ldvt);
+	info = mbv2dgesvd_cpu(false, jobU, jobV, m, n, a, lda, s, u, ldu, vt, ldvt);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -169,7 +169,7 @@ void mv2dgesvds_test()
 	printf("mbv2dgesvds test\n");
 
 	/* Compute SVD */
-	info = mbv2dgesvds(m, n, a, s, u, vt);
+	info = mbv2dgesvds(false, m, n, a, s, u,true, vt, true);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -230,7 +230,7 @@ void mv2dgesvd_test()
 	printf("mbv2dgesvd test\n");
 
 	/* Compute SVD */
-	info = mbv2dgesvd(jobU, jobV, m, n, a, lda, s, u, ldu, vt, ldvt);
+	info = mbv2dgesvd(false, jobU, jobV, m, n, a, lda, s, u, ldu, vt, ldvt);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -276,7 +276,7 @@ void mv2sgesvds_cpu_test()
 
 	/* Local arrays (Col major matrix)*/
 	float s[N], u[LDU * M], vt[LDVT * N];
-
+	//
 	float a[LDA * M] = {
 		8.79f,  6.11f, -9.15f, 9.57f, -3.49f, 9.84f,
 		9.93f,  6.91f, -7.93f, 1.64f,  4.02f, 0.15f,
@@ -289,7 +289,7 @@ void mv2sgesvds_cpu_test()
 	printf("mdv2sgesvds_cpu test\n");
 
 	/* Compute SVD */
-	info = mbv2sgesvds_cpu(m, n, a, s, u, vt);
+	info = mbv2sgesvds_cpu(false, m, n, a, s, u,true, vt, true);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -350,7 +350,7 @@ void mv2sgesvd_cpu_test()
 	printf("mbv2sgesvd_cpu test\n");
 
 	/* Compute SVD */
-	info = mbv2sgesvd_cpu(jobU, jobV, m, n, a, lda, s, u, ldu, vt, ldvt);
+	info = mbv2sgesvd_cpu(false,jobU, jobV, m, n, a, lda, s, u, ldu, vt, ldvt);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -408,7 +408,7 @@ void mv2sgesvds_test()
 	printf("mbv2sgesvds test\n");
 
 	/* Compute SVD */
-	info = mbv2sgesvds(m, n, a, s, u, vt);
+	info = mbv2sgesvds(true,m, n, a, s, u,true, vt, true);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -469,7 +469,7 @@ void mv2sgesvd_test()
 	printf("mbv2sgesvd test\n");
 
 	/* Compute SVD */
-	info = mbv2sgesvd(jobU, jobV, m, n, a, lda, s, u, ldu, vt, ldvt);
+	info = mbv2sgesvd(true,jobU, jobV, m, n, a, lda, s, u, ldu, vt, ldvt);
 
 	/* Check for convergence */
 	if (info > 0) {

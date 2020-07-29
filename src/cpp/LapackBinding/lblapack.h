@@ -35,24 +35,22 @@ namespace LapackBinding
 	char convertToChar(mbv2vector vec);
 
 	//AX=B - solver
-	extern "C" MAGMABINDINGS_API int mbv2sgesv_cpu(int n, int nrhs, float* A, int lda, int* ipiv, float* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int ldb);
 	//double
-	extern "C" MAGMABINDINGS_API int mbv2dgesv_cpu(int n, int nrhs, double* A, int lda, int* ipiv, double* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2dgesv_cpu(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int ldb);
 	
 	//SVD
-	extern "C" MAGMABINDINGS_API int mbv2sgesvd_cpu(mbv2vector jobu, mbv2vector jobv, int m, int n,
-		float* A, int lda, float* s, float* U, int ldu, float* VT, int ldvt);
-	extern "C" MAGMABINDINGS_API int mbv2sgesvds_cpu(int m, int n, float* A, float* s, float* U, float* VT);
+	extern "C" MAGMABINDINGS_API int mbv2sgesvd_cpu(bool rowmajor, mbv2vector jobu, mbv2vector jobv, int m, int n, float* A, int lda, float* s, float* U, int ldu, float* VT, int ldvt);
+	extern "C" MAGMABINDINGS_API int mbv2sgesvds_cpu(bool rowmajor, int m, int n, float* A, float* s, float* U, bool calcU, float* VT, bool calcV);
 	
 	//SVD
-	extern "C" MAGMABINDINGS_API int mbv2dgesvd_cpu(mbv2vector jobu, mbv2vector jobv, int m, int n,
-		double* A, int lda, double* s, double* U, int ldu, double* VT, int ldvt);
-	extern "C" MAGMABINDINGS_API int mbv2dgesvds_cpu(int m, int n, double* A, double* s, double* U, double* VT);
+	extern "C" MAGMABINDINGS_API int mbv2dgesvd_cpu(bool rowmajor, mbv2vector jobu, mbv2vector jobv, int m, int n, double* A, int lda, double* s, double* U, int ldu, double* VT, int ldvt);
+	extern "C" MAGMABINDINGS_API int mbv2dgesvds_cpu(bool rowmajor, int m, int n, double* A, double* s, double* U, bool calcU, double* VT, bool calcV);
+	
 	
 
 	//LSS - least squares solver
 	extern "C" MAGMABINDINGS_API int mbv2sgels_cpu(int m, int n, int nrhs, float* A, int lda, float* B, int lbd);
-	
 	extern "C" MAGMABINDINGS_API int mbv2dgels_cpu(int m, int n, int nrhs, double* A, int lda, double* B, int lbd);
 	
 	//EIGEN

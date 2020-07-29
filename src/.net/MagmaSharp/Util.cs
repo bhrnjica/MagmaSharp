@@ -1,15 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 namespace MagmaSharp
 {
+    public static class GenericCopier<T>    //deep copy a list
+    {
+        public static T DeepCopy(object objectToCopy)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                binaryFormatter.Serialize(memoryStream, objectToCopy);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                return (T)binaryFormatter.Deserialize(memoryStream);
+            }
+        }
+    }
+
     /// <summary>
     /// Utility class for data preparation before magmabinding method calls
     /// </summary>
     public static class Util
     {
+        public static T DeepCopy<T>(T objectToCopy)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                binaryFormatter.Serialize(memoryStream, objectToCopy);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                return (T)binaryFormatter.Deserialize(memoryStream);
+            }
+        }
+
+        public static T[] To1DRowArray<T>(T[,] array)
+        {
+            int n = array.GetLength(0);//num of rows
+            int m = array.GetLength(1);//num of cols
+            T[] flatArray = new T[n * m];
+            int k = 0;
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < m; j++)
+                {
+                    flatArray[k++] = array[i, j];
+                }
+            }
+            return flatArray;
+        }
 
         /// <summary>
         /// Takes 2D row major matrix to convert it to column major 1D array matrix
@@ -28,6 +70,41 @@ namespace MagmaSharp
                 for (int j = 0; j < n; j++)
                 {
                     flatArray[k++] = array[j, i];
+                }
+            }
+            return flatArray;
+        }
+
+        unsafe public static double[] To1DdArray<T>(double[,] array)
+        {
+            int n = array.GetLength(0);//num of rows
+            int m = array.GetLength(1);//num of cols
+            double[] flatArray = new double[n * m];
+            if (flatArray.Length == array.Length)
+            {
+                fixed (double* pA = array, pB = flatArray)
+                {
+                    for(int i=0; i< flatArray.Length; i++)
+                    {
+                        pB[i] = pA[i];
+                    }
+                }
+            }
+            return flatArray;
+        }
+        unsafe public static float[] To1DsArray<T>(float[,] array)
+        {
+            int n = array.GetLength(0);//num of rows
+            int m = array.GetLength(1);//num of cols
+            float[] flatArray = new float[n * m];
+            if (flatArray.Length == array.Length)
+            {
+                fixed (float* pA = array, pB = flatArray)
+                {
+                    for (int i = 0; i < flatArray.Length; i++)
+                    {
+                        pB[i] = pA[i];
+                    }
                 }
             }
             return flatArray;

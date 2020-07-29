@@ -12,195 +12,245 @@ namespace MagmaBinding
 {
 	//Helper
 	extern magma_vec_t convertToVec(mbv2vector vec);
+	extern void transpose(float* src, float* dst, const int N, const int M);
+	extern void transpose(double* src, double* dst, const int N, const int M);
+	extern void print_matrix(char* desc, int m, int n, float* a, const int lda);
+	extern void print_matrix(char* desc, int m, int n, double* a, const int lda);
 
-	/// <summary>
-	/// DGESV solves a system of linear equations A * X = B where A is a general N-by-N matrix and X and B are N-by-NRHS matrices.
-	/// The LU decomposition with partial pivoting and row interchanges is used to factor A as A = P * L * U, where P is a permutation matrix, 
-	///  L is unit lower triangular, and U is upper triangular. The factored form of A is then used to solve the system of equations A * X = B.
-	/// </summary>
-	/// <param name="n">The number of linear equations, that is, the order of the matrix A; n≥ 0.</param>
-	/// <param name="nrhs">The number of right-hand sides, that is, the number of columns of the matrix B; nrhs≥ 0.</param>
-	/// <param name="A"> Array, dimension (LDA,N). On entry, the M-by-N matrix to be factored. On exit, the factors L and U from the factorization 
-	///  A = P*L*U; the unit diagonal elements of L are not stored.</param>
-	/// <param name="lda">The leading dimension of the array A. LDA >= max(1,N).</param>
-	/// <param name="ipiv"> Array, dimension (min(M,N)) The pivot indices; for 1 <= i <= min(M,N), row i of the matrix was interchanged with row IPIV(i).</param>
-	/// <param name="B">array, dimension (LDB,NRHS) On entry, the right hand side matrix B. On exit, the solution matrix X.</param>
-	/// <param name="lbd">The leading dimension of the array B. LDB >= max(1,N).</param>
-	/// <param name="info">		= 0: successful exit; 
-	/// 						< 0: if INFO = -i, the i - th argument had an illegal value.</param>
-	/// <returns></returns>
-	int mbv2dgesv(int n, int nrhs, double* A, int lda, int* ipiv, double* B, int lbd)
+	
+	int mbv2dgesv(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int ldb)
 	{
 		magma_init(); // initialize Magma
-		int info;
-		// solve the linear system a*x=c
-		// c -mxn matrix , a -mxm matrix ;
-		// c is overwritten by the solution
-		magma_dgesv(n, nrhs, A, lda, ipiv, B, lbd, &info);
 
-		//printf(" magma_dgesv time : %7.5 f sec .\n", gpu_time); // time
+		int info;
+		double* At = NULL, * Bt = NULL;
+
+		if (rowmajor)
+		{
+			magma_dmalloc_pinned(&At, (const int)(lda * n));
+			magma_dmalloc_pinned(&Bt, (const int)(n * nrhs));
+
+			//
+			transpose(A, At, lda, n);
+			transpose(B, Bt, ldb, nrhs);
+			magma_dgesv(n, nrhs, At, lda, ipiv, Bt, ldb, &info);
+
+			//transpose results into row major matrix
+			transpose(At, A, n, lda);
+			transpose(Bt, B, nrhs, ldb);
+		}
+		else
+			magma_dgesv(n, nrhs, A, lda, ipiv, B, ldb, &info);
+
+		//free memory
+		magma_free_pinned(At);
+		magma_free_pinned(Bt);
 
 		magma_finalize(); // finalize Magma
 
-		return info;
-	}
-
-	/// <summary>
-	/// DGESV solves a system of linear equations A * X = B where A is a general N-by-N matrix and X and B are N-by-NRHS matrices.
-	/// The LU decomposition with partial pivoting and row interchanges is used to factor A as A = P * L * U, where P is a permutation matrix, 
-	/// L is unit lower triangular, and U is upper triangular. The factored form of A is then used to solve the system of equations A * X = B.
-	/// </summary>
-	/// <param name="n">The number of linear equations, that is, the order of the matrix A; n≥ 0.</param>
-	/// <param name="nrhs">The number of right-hand sides, that is, the number of columns of the matrix B; nrhs≥ 0.</param>
-	/// <param name="A"> Array, dimension (LDA,N). On entry, the M-by-N matrix to be factored. On exit, the factors L and U from the factorization 
-	///  A = P*L*U; the unit diagonal elements of L are not stored.</param>
-	/// <param name="lda">The leading dimension of the array A. LDA >= max(1,N).</param>
-	/// <param name="ipiv"> Array, dimension (min(M,N)) The pivot indices; for 1 <= i <= min(M,N), row i of the matrix was interchanged with row IPIV(i).</param>
-	/// <param name="B">array, dimension (LDB,NRHS) On entry, the right hand side matrix B. On exit, the solution matrix X.</param>
-	/// <param name="lbd">The leading dimension of the array B. LDB >= max(1,N).</param>
-	/// <param name="info">		= 0: successful exit; 
-	/// 						< 0: if INFO = -i, the i - th argument had an illegal value.</param>
-	/// <returns></returns>
-	int mbv2dgesv_gpu(int n, int nrhs, double* A, int ldda, int* ipiv, double* B, int lddb)
-	{
-		magma_init();
-		int info;
-		magma_queue_t queue = NULL;
-		magma_int_t dev = 0;
-		magma_queue_create(dev, &queue);
-		//
-		int nxn = n * n;//squared matrix of the system
-		int nxm = nrhs * n;//mostly B matrix is n x 1
-
-		/* Copy matrix C from the CPU to the GPU */
-		double* dA, * dX;
-		magma_dmalloc(&dA, nxn);
-		magma_dmalloc(&dX, nxm);
-		assert(dA != nullptr);
-		assert(dX != nullptr);
-
-		// ... fill in dA and dX (on GPU)
-		magma_dsetmatrix(n, n, A, ldda, dA, ldda, queue); // copy A -> dA
-		magma_dsetmatrix(n, nrhs, B, lddb, dX, lddb, queue); // copy B -> dX
-
-		// solve AX = B where B is in X
-		magma_dgesv_gpu(n, nrhs, dA, ldda, ipiv, dX, lddb, &info);
-
-		//retrieve the results matrix X from GPU
-		magma_dgetmatrix(n, nrhs, dX, lddb, B, lddb, queue);
-		magma_dgetmatrix(n, n, dA, ldda, A, ldda, queue);
-
-		magma_free(dA);// free host memory
-		magma_free(dX);// free host memory
-		magma_queue_destroy(queue); // destroy queue
-		magma_finalize();
 		return info;
 	}
 
 	
-	/// <summary>
-	/// DGESV solves a system of linear equations A * X = B where A is a general N-by-N matrix and X and B are N-by-NRHS matrices.
-	/// The LU decomposition with partial pivoting and row interchanges is used to factor A as A = P * L * U, where P is a permutation matrix, 
-	///  L is unit lower triangular, and U is upper triangular. The factored form of A is then used to solve the system of equations A * X = B.
-	/// </summary>
-	/// <param name="n">The number of linear equations, that is, the order of the matrix A; n≥ 0.</param>
-	/// <param name="nrhs">The number of right-hand sides, that is, the number of columns of the matrix B; nrhs≥ 0.</param>
-	/// <param name="A"> Array, dimension (LDA,N). On entry, the M-by-N matrix to be factored. On exit, the factors L and U from the factorization 
-	///  A = P*L*U; the unit diagonal elements of L are not stored.</param>
-	/// <param name="lda">The leading dimension of the array A. LDA >= max(1,N).</param>
-	/// <param name="ipiv"> Array, dimension (min(M,N)) The pivot indices; for 1 <= i <= min(M,N), row i of the matrix was interchanged with row IPIV(i).</param>
-	/// <param name="B">array, dimension (LDB,NRHS) On entry, the right hand side matrix B. On exit, the solution matrix X.</param>
-	/// <param name="lbd">The leading dimension of the array B. LDB >= max(1,N).</param>
-	/// <param name="info">		= 0: successful exit; 
-	/// 						< 0: if INFO = -i, the i - th argument had an illegal value.</param>
-	/// <returns></returns>
-	int mbv2sgesv(int n, int nrhs, float* A, int lda, int* ipiv, float* B, int lbd)
+	int mbv2dgesv_gpu(bool rowmajor, int n, int nrhs, double* A, int ldda, int* ipiv, double* B, int lddb)
+	{
+		magma_init();
+
+		int info;
+		magma_queue_t queue = NULL;
+		magma_int_t dev = 0;
+		magma_queue_create(dev, &queue);
+
+		//
+		int nxn = ldda * n;//squared matrix of the system
+		int nxm = nrhs * lddb;//mostly B matrix is n x 1
+
+		/* Copy matrix C from the CPU to the GPU */
+		double* dA, * dX, * At = NULL, * Bt = NULL;
+		if (rowmajor)
+		{
+			magma_dmalloc_pinned(&At, (const int)(nxn));
+			magma_dmalloc_pinned(&Bt, (const int)(nxm));
+			//
+			transpose(A, At, ldda, n);
+			transpose(B, Bt, lddb, nrhs);
+		}
+
+		magma_dmalloc(&dA, nxn);
+		magma_dmalloc(&dX, nxm);
+
+		if (rowmajor)
+		{
+			// ... fill in dA and dX (on GPU)
+			magma_dsetmatrix(n, n, At, ldda, dA, ldda, queue); // copy A -> dA
+			magma_dsetmatrix(n, nrhs, Bt, lddb, dX, lddb, queue); // copy B -> dX
+		}
+		else
+		{
+			// ... fill in dA and dX (on GPU)
+			magma_dsetmatrix(n, n, A, ldda, dA, ldda, queue); // copy A -> dA
+			magma_dsetmatrix(n, nrhs, B, lddb, dX, lddb, queue); // copy B -> dX
+		}
+
+		// solve AX = B where B is in X
+		magma_dgesv_gpu(n, nrhs, dA, ldda, ipiv, dX, lddb, &info);
+
+		if (rowmajor)
+		{
+			//retrieve the results matrix X from GPU
+			magma_dgetmatrix(n, nrhs, dX, lddb, Bt, lddb, queue);
+			magma_dgetmatrix(n, n, dA, ldda, At, ldda, queue);
+
+			//
+			transpose(At, A, n, ldda);
+			transpose(Bt, B, nrhs, lddb);
+		}
+		else
+		{
+			//retrieve the results matrix X from GPU
+			magma_dgetmatrix(n, nrhs, dX, lddb, B, lddb, queue);
+			magma_dgetmatrix(n, n, dA, ldda, A, ldda, queue);
+		}
+
+
+		magma_free(dA);// free host memory
+		magma_free(dX);// free host memory
+		magma_free_pinned(At);
+		magma_free_pinned(Bt);
+		magma_queue_destroy(queue); // destroy queue
+		magma_finalize();
+		return 0;
+	}
+
+	
+	int mbv2sgesv(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int ldb)
 	{
 		magma_init(); // initialize Magma
-		//real_Double_t gpu_time;
+		
 		int info;
-		// solve the linear system a*x=c
-		// c -mxn matrix , a -mxm matrix ;
-		// c is overwritten by the solution
-		//gpu_time = magma_sync_wtime(NULL);
+		float * At = NULL, *Bt = NULL;
 
-		magma_sgesv(n, nrhs, A, lda, ipiv, B, lbd, &info);
+		if (rowmajor)
+		{
+			magma_smalloc_pinned(&At, (const int)(lda * n));
+			magma_smalloc_pinned(&Bt, (const int)(n * nrhs));
 
-		//gpu_time = magma_sync_wtime(NULL) - gpu_time;
+			//
+			transpose(A, At, lda, n);
+			transpose(B, Bt, ldb, nrhs);
+			magma_sgesv(n, nrhs, At, lda, ipiv, Bt, ldb, &info);
 
-
-		//printf(" magma_dgesv time : %7.5 f sec .\n", gpu_time); // time
+			//transpose results into row major matrix
+			transpose(At, A, n, lda);
+			transpose(Bt, B, nrhs, ldb);
+		}
+		else
+			magma_sgesv(n, nrhs, A, lda, ipiv, B, ldb, &info);
+		
+		//free memory
+		magma_free_pinned(At);
+		magma_free_pinned(Bt);
 
 		magma_finalize(); // finalize Magma
 
 		return info;
 	}
 
-	/// <summary>
-	/// DGESV solves a system of linear equations A * X = B where A is a general N-by-N matrix and X and B are N-by-NRHS matrices.
-	/// The LU decomposition with partial pivoting and row interchanges is used to factor A as A = P * L * U, where P is a permutation matrix, 
-	/// L is unit lower triangular, and U is upper triangular. The factored form of A is then used to solve the system of equations A * X = B.
-	/// </summary>
-	/// <param name="n">The number of linear equations, that is, the order of the matrix A; n≥ 0.</param>
-	/// <param name="nrhs">The number of right-hand sides, that is, the number of columns of the matrix B; nrhs≥ 0.</param>
-	/// <param name="A"> Array, dimension (LDA,N). On entry, the M-by-N matrix to be factored. On exit, the factors L and U from the factorization 
-	///  A = P*L*U; the unit diagonal elements of L are not stored.</param>
-	/// <param name="lda">The leading dimension of the array A. LDA >= max(1,N).</param>
-	/// <param name="ipiv"> Array, dimension (min(M,N)) The pivot indices; for 1 <= i <= min(M,N), row i of the matrix was interchanged with row IPIV(i).</param>
-	/// <param name="B">array, dimension (LDB,NRHS) On entry, the right hand side matrix B. On exit, the solution matrix X.</param>
-	/// <param name="lbd">The leading dimension of the array B. LDB >= max(1,N).</param>
-	/// <param name="info">		= 0: successful exit; 
-	/// 						< 0: if INFO = -i, the i - th argument had an illegal value.</param>
-	/// <returns></returns>
-	int mbv2sgesv_gpu(int n, int nrhs, float* A, int ldda, int* ipiv, float* B, int lddb)
+	int mbv2sgesv_gpu(bool rowmajor, int n, int nrhs, float* A, int ldda, int* ipiv, float* B, int lddb)
 	{
 		magma_init();
+
 		int info;
 		magma_queue_t queue = NULL;
 		magma_int_t dev = 0;
 		magma_queue_create(dev, &queue);
+
 		//
-		int nxn = n * n;//squared matrix of the system
-		int nxm = nrhs * n;//mostly B matrix is n x 1
+		int nxn = ldda * n;//squared matrix of the system
+		int nxm = nrhs * lddb;//mostly B matrix is n x 1
 
 		/* Copy matrix C from the CPU to the GPU */
-		float* dA, * dX;
+		float* dA, * dX, *At = NULL, * Bt = NULL;
+		if (rowmajor)
+		{
+			magma_smalloc_pinned(&At, (const int)(nxn));
+			magma_smalloc_pinned(&Bt, (const int)(nxm));
+			//
+			transpose(A, At, ldda, n);
+			transpose(B, Bt, lddb, nrhs);
+		}
+
 		magma_smalloc(&dA, nxn);
 		magma_smalloc(&dX, nxm);
-		assert(dA != nullptr);
-		assert(dX != nullptr);
 
-		// ... fill in dA and dX (on GPU)
-		magma_ssetmatrix(n, n, A, ldda, dA, ldda, queue); // copy A -> dA
-		magma_ssetmatrix(n, nrhs, B, lddb, dX, lddb, queue); // copy B -> dX
+		if (rowmajor)
+		{
+			// ... fill in dA and dX (on GPU)
+			magma_ssetmatrix(n, n, At, ldda, dA, ldda, queue); // copy A -> dA
+			magma_ssetmatrix(n, nrhs, Bt, lddb, dX, lddb, queue); // copy B -> dX
+		}
+		else
+		{
+			// ... fill in dA and dX (on GPU)
+			magma_ssetmatrix(n, n, A, ldda, dA, ldda, queue); // copy A -> dA
+			magma_ssetmatrix(n, nrhs, B, lddb, dX, lddb, queue); // copy B -> dX
+		}
 
 		// solve AX = B where B is in X
 		magma_sgesv_gpu(n, nrhs, dA, ldda, ipiv, dX, lddb, &info);
 
-		//retrieve the results matrix X from GPU
-		magma_sgetmatrix(n, nrhs, dX, lddb, B, lddb, queue);
-		magma_sgetmatrix(n, n, dA, ldda, A, ldda, queue);
+		if (rowmajor)
+		{
+			//retrieve the results matrix X from GPU
+			magma_sgetmatrix(n, nrhs, dX, lddb, Bt, lddb, queue);
+			magma_sgetmatrix(n, n, dA, ldda, At, ldda, queue);
+
+			//
+			transpose(At, A, n, ldda);
+			transpose(Bt, B, nrhs, lddb);
+		}
+		else
+		{
+			//retrieve the results matrix X from GPU
+			magma_sgetmatrix(n, nrhs, dX, lddb, B, lddb, queue);
+			magma_sgetmatrix(n, n, dA, ldda, A, ldda, queue);
+		}
+		
 
 		magma_free(dA);// free host memory
 		magma_free(dX);// free host memory
+		magma_free_pinned(At);
+		magma_free_pinned(Bt);
 		magma_queue_destroy(queue); // destroy queue
 		magma_finalize();
 		return 0;
 	}
 
 	//SVD
-	int mbv2sgesvds(int m, int n, float* A, float* s, float* U, float* VT)
+	int mbv2sgesvds(bool rowmajor, int m, int n, float* A, float* s, float* U, bool calcU, float* VT, bool calcV)
 	{
 		//U and V matrices
-		mbv2vector jobU = mbv2vector::MagmaAllVec;
-		mbv2vector jobV = mbv2vector::MagmaAllVec;
-		
-		int info =  mbv2sgesvd(jobU, jobV, m, n, A, m, s, U, m, VT, n);
-		return info;
+		mbv2vector jobV;
+		mbv2vector jobU;
+
+		if (calcU)
+			jobU = mbv2vector::MagmaAllVec;
+		else
+			jobU = mbv2vector::MagmaNoVec;
+		//
+		if (calcV)
+			jobV = mbv2vector::MagmaAllVec;
+		else
+			jobV = mbv2vector::MagmaNoVec;
+		//
+		int lda = rowmajor  ? m : n;
+		int ldu = m;
+		int ldvt = n;
+
+		return mbv2sgesvd(rowmajor, jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt);
 	}
 
-	
-	int mbv2sgesvd(mbv2vector jobu, mbv2vector jobv, int m, int n, float* A, int lda, float* s, float* U, int ldu, float* VT, int ldvt)
+	int mbv2sgesvd(bool rowmajor, mbv2vector jobu, mbv2vector jobv, int m, int n, float* A, int lda, float* s, float* U, int ldu, float* VT, int ldvt)
 	{
 		//magma_print_environment();
 		magma_init();
@@ -211,6 +261,7 @@ namespace MagmaBinding
 		const double d_neg_one = -1;
 		const double nan = MAGMA_D_NAN;
 		int info;
+
 		//convert job
 		magma_vec_t jobU = convertToVec(jobu);
 		magma_vec_t jobV = convertToVec(jobv);
@@ -218,39 +269,94 @@ namespace MagmaBinding
 		//query for workspace size
 		magma_int_t query_magma;
 		float dummy[1];
-		float* h_work; // h_work - workspace
+		float* h_work, *At = NULL, *Ut = NULL, *VTt = NULL; 
+
+		//calculate query
 		int inf = magma_sgesvd(jobU, jobV, m, n, NULL, lda, NULL, NULL, ldu, NULL, ldvt, dummy, ineg_one, &info);
 
 		assert(inf == 0);
 		query_magma = (magma_int_t)MAGMA_D_REAL(dummy[0]);
 		magma_smalloc_pinned(&h_work, query_magma); // host memory for h_work
 
+		if(rowmajor)
+			magma_smalloc_pinned(&At , (const int) (lda * n));
+
+		//allocate left and right orthonormal matrices
+		if(jobU== magma_vec_t::MagmaAllVec && rowmajor)
+			magma_smalloc_pinned(&Ut, (const int)(m * m));
+		if(jobV == magma_vec_t::MagmaAllVec && rowmajor)
+			magma_smalloc_pinned(&VTt, (const int)(n * n));
+		
+		//define queue
+		magma_queue_t queue = NULL;
+		magma_int_t dev = 0;
+		magma_queue_create(dev, &queue);
+
 		/* Compute SVD */
-		inf = magma_sgesvd(jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt, h_work, query_magma, &info);
+		if (rowmajor)
+		{
+			//before compute transpose the matrix into col major 
+			transpose(A, At, m, n);
+			inf = magma_sgesvd(jobU, jobV, m, n, At, lda, s, Ut, ldu, VTt, ldvt, h_work, query_magma, &info);
+
+			//transpose results into row major matrix
+			transpose(At, A, m, n);
+
+			//transpose left orthonormal matrix
+			if (jobU == magma_vec_t::MagmaAllVec)
+				transpose(Ut, U, m, m);
+
+			//transpose left orthonormal matrix
+			if (jobV == magma_vec_t::MagmaAllVec)
+				transpose(VTt, VT, n, n);
+		}
+		else
+			inf = magma_sgesvd(jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt, h_work, query_magma, &info);
 
 		/* Check for convergence */
 		if (inf > 0) {
 			printf("The algorithm computing SVD failed to converge.\n");
 		}
 
+		
+		/*print_matrix((char*)"Left Matrix U=",m,m,U, m);
+		print_matrix((char*)"RIGHT Matrix L=", n, n, VT, n);*/
+
 		// Free memory
+		magma_free_pinned(At); // free host memory
+		magma_free_pinned(Ut); // free host memory
+		magma_free_pinned(VTt); // free host memory
 		magma_free_pinned(h_work); // free host memory
 		magma_finalize(); // finalize Magma
 
 		return info;
 	}
 
-	int mbv2dgesvds(int m, int n, double* A, double* s, double* U, double* VT)
+	int mbv2dgesvds(bool rowmajor, int m, int n, double* A, double* s, double* U, bool calcU, double* VT, bool calcV)
 	{
 		//U and V matrices
-		mbv2vector jobU = mbv2vector::MagmaAllVec;
-		mbv2vector jobV = mbv2vector::MagmaAllVec;
-		
-		return mbv2dgesvd(jobU, jobV, m, n, A, m, s, U, m, VT, n);
+		mbv2vector jobV;
+		mbv2vector jobU;
+
+		if (calcU)
+			jobU = mbv2vector::MagmaAllVec;
+		else
+			jobU = mbv2vector::MagmaNoVec;
+		//
+		if (calcV)
+			jobV = mbv2vector::MagmaAllVec;
+		else
+			jobV = mbv2vector::MagmaNoVec;
+		//
+		int lda = rowmajor? m : n;
+		int ldu = m;
+		int ldvt = n;
+
+		return mbv2dgesvd(rowmajor, jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt);
+
 	}
 
-	int mbv2dgesvd(mbv2vector jobu, mbv2vector jobv, int m, int n,
-		double* A, int lda, double* s, double* U, int ldu, double* VT, int ldvt)
+	int mbv2dgesvd(bool rowmajor, mbv2vector jobu, mbv2vector jobv, int m, int n, double* A, int lda, double* s, double* U, int ldu, double* VT, int ldvt)
 	{
 		magma_init();
 		int info;
@@ -266,23 +372,69 @@ namespace MagmaBinding
 		//query for workspace size
 		magma_int_t query_magma;
 		double dummy[1];
-		double* h_work; // h_work - workspace
+		double* h_work, * At=NULL, * Ut = NULL, * VTt = NULL; // h_work - workspace
 		int inf = magma_dgesvd(jobU, jobV, m, n, NULL, lda, NULL, NULL, ldu, NULL, ldvt, dummy, ineg_one, &info);
 
 		assert(inf == 0);
 		query_magma = (magma_int_t)MAGMA_D_REAL(dummy[0]);
 		magma_dmalloc_pinned(&h_work, query_magma); // host memory for h_work
+		magma_dmalloc_pinned(&At, (const int)(lda * n));
+
+		//allocate left and right orthonormal matrices
+		if (jobU == magma_vec_t::MagmaAllVec && rowmajor)
+			magma_dmalloc_pinned(&Ut, (const int)(m * m));
+
+		if (jobV == magma_vec_t::MagmaAllVec && rowmajor)
+			magma_dmalloc_pinned(&VTt, (const int)(n * n));
+
+		//define queue
+		magma_queue_t queue = NULL;
+		magma_int_t dev = 0;
+		magma_queue_create(dev, &queue);
 
 		/* Compute SVD */
-		inf = magma_dgesvd(jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt, h_work, query_magma, &info);
+		if (rowmajor)
+		{
+			//before compute transpose the matrix into col major 
+			transpose(A, At, m, n);
+			inf = magma_dgesvd(jobU, jobV, m, n, At, lda, s, Ut, ldu, VTt, ldvt, h_work, query_magma, &info);
+		}
+		else
+			inf = magma_dgesvd(jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt, h_work, query_magma, &info);
 		
 		/* Check for convergence */
 		if (inf > 0) {
 			printf("The algorithm computing SVD failed to converge.\n");
 		}
 
-		//Free memory
+
+		//transpose results into row major matrix
+		if (rowmajor)
+			transpose(At, A, m, n);
+
+		//transpose left orthonormal matrix
+		if (jobU == magma_vec_t::MagmaAllVec && rowmajor)
+			transpose(Ut, U, m, m);
+
+		//transpose left orthonormal matrix
+		if (jobV == magma_vec_t::MagmaAllVec )
+			transpose(VTt, VT, n, n);
+
+
+		/*print_matrix((char*)"Left Matrix U=",m,m,U, m);
+		print_matrix((char*)"RIGHT Matrix L=", n, n, VT, n);*/
+
+		// Free memory
+		if (rowmajor)
+		{
+			magma_free_pinned(At); // free host memory
+			if (jobU == magma_vec_t::MagmaAllVec && rowmajor)
+				magma_free_pinned(Ut); // free host memory
+			if (jobV == magma_vec_t::MagmaAllVec && rowmajor)
+				magma_free_pinned(VTt); // free host memory
+		}
 		magma_free_pinned(h_work); // free host memory
+
 		magma_finalize(); // finalize Magma
 
 		return info;
@@ -582,6 +734,55 @@ namespace MagmaBinding
 		}
 		return magma_vec_t::MagmaNoVec;
 	}
+
+
+	void transpose(float* src, float* dst, const int N, const int M)
+	{
+#pragma omp parallel for
+		for (int n = 0; n < N * M; n++)
+		{
+			int i = n / N;
+			int j = n % N;
+			dst[n] = src[M * j + i];
+		}
+	}
+
+	void transpose(double* src, double* dst, const int N, const int M)
+	{
+#pragma omp parallel for
+		for (int n = 0; n < N * M; n++)
+		{
+			int i = n / N;
+			int j = n % N;
+			dst[n] = src[M * j + i];
+		}
+	}
+
+	void print_matrix(char* desc, int m, int n, float* a, const int lda) {
+		int i, j;
+		printf("\n %s\n", desc);
+		for (i = 0; i < m; i++)
+		{
+			for (j = 0; j < n; j++)
+				printf(" %6.2f", a[i * lda + j]);
+
+			printf("\n");
+		}
+	}
+
+
+	void print_matrix(char* desc, int m, int n, double* a, const int lda) {
+		int i, j;
+		printf("\n %s\n", desc);
+		for (i = 0; i < m; i++)
+		{
+			for (j = 0; j < n; j++)
+				printf(" %6.2f", a[i * lda + j]);
+
+			printf("\n");
+		}
+	}
+
 
 }
 

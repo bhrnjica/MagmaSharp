@@ -7,37 +7,54 @@
 
 namespace LapackBinding
 {
+	extern void print_matrix(char* desc, int m, int n, float* a, const int lda);
 	
-	int mbv2dgesv_cpu(int n, int nrhs, double* A, int lda, int* ipiv, double* B, int lbd)
+	int mbv2dgesv_cpu(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int ldb)
 	{
 		int info;
-		info = LAPACKE_dgesv(LAPACK_COL_MAJOR, n, nrhs, A, lda, ipiv, B, lbd);
+		if (rowmajor)
+			info = info = LAPACKE_dgesv(LAPACK_ROW_MAJOR, n, nrhs, A, lda, ipiv, B, ldb);
+		else
+			info = info = LAPACKE_dgesv(LAPACK_COL_MAJOR, n, nrhs, A, lda, ipiv, B, ldb);
 		return info;
 
 	}
 
-	int mbv2sgesv_cpu(int n, int nrhs, float* A, int lda, int* ipiv, float* B, int lbd)
+	int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int ldb)
 	{
 		int info;
-		info = LAPACKE_sgesv(LAPACK_COL_MAJOR, n, nrhs, A, lda, ipiv, B, lbd);
+		if(rowmajor)
+			info = LAPACKE_sgesv(LAPACK_ROW_MAJOR, n, nrhs, A, lda, ipiv, B, ldb);
+		else
+			info = LAPACKE_sgesv(LAPACK_COL_MAJOR, n, nrhs, A, lda, ipiv, B, ldb);
 		return info;
 
 	}
 
 	//SVD
-	int mbv2sgesvds_cpu(int m, int n, float* A, float* s, float* U, float* VT)
+	int mbv2sgesvds_cpu(bool rowmajor, int m, int n, float* A, float* s, float* U, bool calcU, float* VT, bool calcV)
 	{
 		//U and V matrices
-		mbv2vector jobU = mbv2vector::MagmaAllVec;
-		mbv2vector jobV = mbv2vector::MagmaAllVec;
-		int lda = m;
+		mbv2vector jobV;
+		mbv2vector jobU;
+
+		if (calcU)
+			jobU = mbv2vector::MagmaAllVec;
+		else
+			jobU = mbv2vector::MagmaNoVec;
+		//
+		if(calcV)
+			jobV = mbv2vector::MagmaAllVec;
+		else
+			jobV = mbv2vector::MagmaNoVec;
+		//
+		int lda = rowmajor ? n : m;
 		int ldu = m;
 		int ldvt = n;
-		return mbv2sgesvd_cpu(jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt);
+		return mbv2sgesvd_cpu(rowmajor, jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt);
 	}
 	
-	int mbv2sgesvd_cpu(mbv2vector jobu, mbv2vector jobv, int m, int n,
-		float* A, int lda, float* s, float* U, int ldu, float* VT, int ldvt)
+	int mbv2sgesvd_cpu(bool rowmajor, mbv2vector jobu, mbv2vector jobv, int m, int n, float* A, int lda, float* s, float* U, int ldu, float* VT, int ldvt)
 	{
 		
 		int info;
@@ -49,8 +66,13 @@ namespace LapackBinding
 		const int dim = min(m, n) - 1;
 		float* superb = (float*)malloc(dim * sizeof(float));
 		
+		//print_matrix((char*)"Matrica ", m, n, A, lda);
+
 		/* Compute SVD */
-		info = LAPACKE_sgesvd(LAPACK_COL_MAJOR, jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt, superb);
+		if(rowmajor)
+			info = LAPACKE_sgesvd(LAPACK_ROW_MAJOR, jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt, superb);
+		else
+			info = LAPACKE_sgesvd(LAPACK_COL_MAJOR, jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt, superb);
 
 		/* Check for convergence */
 		if (info > 0)
@@ -61,9 +83,8 @@ namespace LapackBinding
 		free(superb); // free host memory
 		return info;
 	}
-	
-	int mbv2dgesvd_cpu(mbv2vector jobu, mbv2vector jobv, int m, int n,
-		double* A, int lda, double* s, double* U, int ldu, double* VT, int ldvt)
+
+	int mbv2dgesvd_cpu(bool rowmajor, mbv2vector jobu, mbv2vector jobv, int m, int n, double* A, int lda, double* s, double* U, int ldu, double* VT, int ldvt)
 	{
 		int info;
 		//convert job
@@ -75,7 +96,10 @@ namespace LapackBinding
 		double* superb = (double*)malloc(dim * sizeof(double));
 
 		/* Compute SVD */
-		info = LAPACKE_dgesvd(LAPACK_COL_MAJOR, jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt, superb);
+		if(rowmajor)
+			info = LAPACKE_dgesvd(LAPACK_ROW_MAJOR, jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt, superb);
+		else
+			info = LAPACKE_dgesvd(LAPACK_COL_MAJOR, jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt, superb);
 
 		/* Check for convergence */
 		if (info > 0) {
@@ -85,13 +109,27 @@ namespace LapackBinding
 		free(superb); // free host memory
 		return info;
 	}
-	int mbv2dgesvds_cpu(int m, int n, double* A, double* s, double* U, double* VT)
+	
+	int mbv2dgesvds_cpu(bool rowmajor, int m, int n, double* A, double* s, double* U, bool calcU, double* VT, bool calcV)
 	{
 		//U and V matrices
-		mbv2vector jobU = mbv2vector::MagmaAllVec;
-		mbv2vector jobV = mbv2vector::MagmaAllVec;
+		mbv2vector jobV;
+		mbv2vector jobU;
 
-		return mbv2dgesvd_cpu(jobU, jobV, m, n, A, m, s, U, m, VT, n);
+		if (calcU)
+			jobU = mbv2vector::MagmaAllVec;
+		else
+			jobU = mbv2vector::MagmaNoVec;
+		//
+		if (calcV)
+			jobV = mbv2vector::MagmaAllVec;
+		else
+			jobV = mbv2vector::MagmaNoVec;
+		//
+		int lda = rowmajor ? n : m;
+		int ldu = m;
+		int ldvt = n;
+		return mbv2dgesvd_cpu(rowmajor, jobU, jobV, m, n, A, lda, s, U, ldu, VT, ldvt);
 	}
 	
 	//LSS
@@ -211,6 +249,18 @@ namespace LapackBinding
 				return 'N';
 		}
 		return 'N';
+	}
+
+	void print_matrix(char* desc, int m, int n, float* a, const int lda) {
+		int i, j;
+		printf("\n %s\n", desc);
+		for (i = 0; i < m; i++)
+		{
+			for (j = 0; j < n; j++)
+				printf(" %6.2f", a[i * lda + j]);
+
+			printf("\n");
+		}
 	}
 
 
