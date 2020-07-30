@@ -1,5 +1,5 @@
 # MagmaSharp
-.NET High Level API for MAGMA - .NET High Level API for MAGMA - Matrix Algebra for GPU and Multicore Architectures.
+.NET High Level API for MAGMA - Matrix Algebra for GPU and Multicore Architectures.
 The project is supposed to be High Level API which means not all methods and capabilities will be implemented. In fact only selected and most important method is going to be exposed in the .NET. 
 
 ## Implementation
