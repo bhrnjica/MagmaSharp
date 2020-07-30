@@ -133,14 +133,16 @@ namespace LapackBinding
 	}
 	
 	//LSS
-	int mbv2sgels_cpu(int m, int n, int nrhs, float* A, int lda, float* B, int ldb)
+	int mbv2sgels_cpu(bool rowmajor, int m, int n, int nrhs, float* A, int lda, float* B, int ldb)
 	{
 		//declare helpers
 		int info;
 		
 		/* Solve the equations A*X = B */
-		info = LAPACKE_sgels(LAPACK_COL_MAJOR,'N', m, n, nrhs, A, lda, B, ldb);
-
+		if(rowmajor)
+			info = LAPACKE_sgels(LAPACK_ROW_MAJOR,'N', m, n, nrhs, A, lda, B, ldb);
+		else
+			info = LAPACKE_sgels(LAPACK_COL_MAJOR, 'N', m, n, nrhs, A, lda, B, ldb);
 
 		/* Check for the full rank */
 		if (info > 0) {
@@ -153,13 +155,16 @@ namespace LapackBinding
 
 	}
 
-	int mbv2dgels_cpu(int m, int n, int nrhs, double* A, int lda, double* B, int ldb)
+	int mbv2dgels_cpu(bool rowmajor, int m, int n, int nrhs, double* A, int lda, double* B, int ldb)
 	{
 		//declare helpers
 		int info;
 
 		/* Solve the equations A*X = B */
-		info = LAPACKE_dgels(LAPACK_COL_MAJOR, 'N', m, n, nrhs, A, lda, B, ldb);
+		if(rowmajor)
+			info = LAPACKE_dgels(LAPACK_ROW_MAJOR, 'N', m, n, nrhs, A, lda, B, ldb);
+		else
+			info = LAPACKE_dgels(LAPACK_COL_MAJOR, 'N', m, n, nrhs, A, lda, B, ldb);
 
 
 		/* Check for the full rank */
@@ -174,24 +179,32 @@ namespace LapackBinding
 	}
 
 	//EIGEN
-	int mbv2sgeevs_cpu(int n, float* A, int lda, float* wr, float* wi, float* Vl, int ldvl, float* Vr, int ldvr)
+	int mbv2sgeevs_cpu(bool rowmajor, int n, float* A, int lda, float* wr, float* wi, float* Vl, bool computeLeft, float* Vr, bool computeRight)
 	{
+		char jjobvl = 'N', jjobvr = 'N';
 		//left and right matrices
-		mbv2vector jjobvl = mbv2vector::MagmaNoVec;
-		mbv2vector jjobvr = mbv2vector::MagmaNoVec;
+		if (computeLeft)
+			char jjobvl = 'V';
+		else
+			char jjobvl = 'N';
 
-		return mbv2sgeev_cpu(jjobvl, jjobvr, n, A, lda, wr, wi, Vl, ldvl, Vr, ldvr);
+		if (computeRight)
+			char jjobvr = 'V';
+		else
+			char jjobvr = 'N';
+
+		return mbv2sgeev_cpu(rowmajor, jjobvl, jjobvr, n, A, lda, wr, wi, Vl, n, Vr, n);
 	}
 	
-	int mbv2sgeev_cpu(mbv2vector jobvl, mbv2vector jobvr, int n, float* A, int lda, float* wr, float* wi, float* Vl, int ldvl, float* Vr, int ldvr)
+	int mbv2sgeev_cpu(bool rowmajor, char jobvl, char jobvr, int n, float* A, int lda, float* wr, float* wi, float* Vl, int ldvl, float* Vr, int ldvr)
 	{
 		int info;
-		//convert job
-		char jjobvl = convertToChar(jobvl);
-		char jjobvr = convertToChar(jobvr);
 
 		/* Compute SVD */
-		info = LAPACKE_sgeev(LAPACK_COL_MAJOR,jjobvl, jjobvr, n, A, lda, wr, wi, Vl, ldvr, Vr, ldvr);
+		if(rowmajor)
+			info = LAPACKE_sgeev(LAPACK_ROW_MAJOR, jobvl, jobvr, n, A, lda, wr, wi, Vl, ldvr, Vr, ldvr);
+		else 
+			info = LAPACKE_sgeev(LAPACK_COL_MAJOR, jobvl, jobvr, n, A, lda, wr, wi, Vl, ldvr, Vr, ldvr);
 
 		/* Check for convergence */
 		if (info > 0) 
@@ -203,24 +216,34 @@ namespace LapackBinding
 		return info;
 	}
 	
-	int mbv2dgeevs_cpu(int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl, double* Vr, int ldvr)
+	int mbv2dgeevs_cpu(bool rowmajor, int n, double* A, int lda, double* wr, double* wi, double* Vl, bool computeLeft, double* Vr, bool computeRight)
 	{
-		//left and right matrices
-		mbv2vector jjobvl = mbv2vector::MagmaNoVec;
-		mbv2vector jjobvr = mbv2vector::MagmaNoVec;
+		char jjobvl = 'N', jjobvr = 'N';
 
-		return mbv2dgeev_cpu(jjobvl, jjobvr, n, A, lda, wr, wi, Vl, ldvl, Vr, ldvr);
+		//left and right matrices
+		if(computeLeft)
+			char jjobvl = 'V';
+		else
+			char jjobvl = 'N';
+
+		if(computeRight)
+			char jjobvr = 'V';
+		else
+			char jjobvr = 'N';
+
+		//
+		return mbv2dgeev_cpu(rowmajor, jjobvl, jjobvr, n, A, lda, wr, wi, Vl, n, Vr, n);
 	}
 
-	int mbv2dgeev_cpu(mbv2vector jobvl, mbv2vector jobvr, int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl,double* Vr, int ldvr)
+	int mbv2dgeev_cpu(bool rowmajor, char jobvl, char jobvr, int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl,double* Vr, int ldvr)
 	{
 		int info;
-		//convert job
-		char jjobvl = convertToChar(jobvl);
-		char jjobvr = convertToChar(jobvr);
 
 		/* Compute SVD */
-		info = LAPACKE_dgeev(LAPACK_COL_MAJOR, jjobvl, jjobvr, n, A, lda, wr, wi, Vl, ldvr, Vr, ldvr);
+		if(rowmajor)
+			info = LAPACKE_dgeev(LAPACK_ROW_MAJOR, jobvl, jobvr, n, A, lda, wr, wi, Vl, ldvr, Vr, ldvr);
+		else
+			info = LAPACKE_dgeev(LAPACK_COL_MAJOR, jobvl, jobvr, n, A, lda, wr, wi, Vl, ldvr, Vr, ldvr);
 
 		/* Check for convergence */
 		if (info > 0) {

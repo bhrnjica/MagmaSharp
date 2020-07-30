@@ -16,7 +16,8 @@ namespace MagmaBinding
 	extern void transpose(double* src, double* dst, const int N, const int M);
 	extern void print_matrix(char* desc, int m, int n, float* a, const int lda);
 	extern void print_matrix(char* desc, int m, int n, double* a, const int lda);
-
+	extern void reverseVector(float* arr, int start, int end);
+	extern void reverseVector(double* arr, int start, int end);
 	
 	int mbv2dgesv(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int ldb)
 	{
@@ -444,13 +445,13 @@ namespace MagmaBinding
 
 	//LSS
 
-	int mbv2sgels(int m, int n, int nrhs, float* A, int lda, float* B, int ldb)
+	int mbv2sgels(bool rowmajor, int m, int n, int nrhs, float* A, int lda, float* B, int ldb)
 	{
 		magma_init();
 		//declare helpers
 		int info, lwork;
 		float wkopt;
-		float* work;
+		float* work, *At = NULL, *Bt = NULL;
 
 		/* Query and allocate the optimal workspace */
 		lwork = -1;
@@ -459,11 +460,25 @@ namespace MagmaBinding
 		lwork = (int)wkopt;
 		work = (float*)malloc(lwork * sizeof(float));
 
+		if (rowmajor)
+		{
+			magma_smalloc_pinned(&At, (const int)(lda * n));
+			magma_smalloc_pinned(&Bt, (const int)(nrhs * m));
 
-		/* Solve the equations A*X = B */
-		magma_sgels(magma_trans_t::MagmaNoTrans, m, n, nrhs, A, lda, B, ldb, work, lwork, &info);
+			//before compute transpose the matrix into col major 
+			transpose(A, At, m, n);
+			transpose(B, Bt, m, nrhs);
 
+			/* Solve the equations A*X = B */
+			magma_sgels(magma_trans_t::MagmaNoTrans, m, n, nrhs, At, lda, Bt, ldb, work, lwork, &info);
 
+			//transpose results into row major matrix
+			transpose(Bt, B, nrhs, m);	
+		}
+		else
+			/* Solve the equations A*X = B */
+			magma_sgels(magma_trans_t::MagmaNoTrans, m, n, nrhs, A, lda, B, ldb, work, lwork, &info);
+			
 		/* Check for the full rank */
 		if (info > 0) {
 			printf("The diagonal element %i of the triangular factor ", info);
@@ -473,14 +488,21 @@ namespace MagmaBinding
 
 		/* Free workspace */
 		free((void*)work);
+		if (rowmajor)
+		{
+			magma_free_pinned(At); // free host memory
+			magma_free_pinned(Bt); // free host memory
+		}
+		//
 		magma_finalize();
 		return info;
 
 	}
 
-	int mbv2sgels_gpu(int m, int n, int nrhs, float* A, int lda, float* B, int ldb)
+	int mbv2sgels_gpu(bool rowmajor, int m, int n, int nrhs, float* A, int lda, float* B, int ldb)
 	{
 		magma_init();
+
 		//declare helpers
 		const magma_int_t ineg_one = -1;
 		int info, lwork;
@@ -497,15 +519,33 @@ namespace MagmaBinding
 		magma_smalloc_pinned(&work, lwork); // host memory for h_work
 
 		/* Copy matrix C from the CPU to the GPU */
-		float* dA, * dB;
+		float* dA, * dB, * At = NULL, * Bt = NULL;;
+		if (rowmajor)
+		{
+			magma_smalloc_pinned(&At, (const int)(m*n));
+			magma_smalloc_pinned(&Bt, (const int)(nrhs*m));
+			//
+			transpose(A, At, lda, n);
+			transpose(B, Bt, ldb, nrhs);
+		}
+
 		magma_smalloc(&dA, (const int)(lda * n));
 		magma_smalloc(&dB, (const int)(ldb * nrhs));
-		assert(dA != nullptr);
-		assert(dB != nullptr);
+		
+		if (rowmajor)
+		{
+			// ... fill in dA and dX (on GPU)
+			magma_ssetmatrix(lda, n, At, lda, dA, lda, queue); // copy A -> dA
+			magma_ssetmatrix(ldb, nrhs, Bt, ldb, dB, ldb, queue); // copy B -> dX
+		}
+		else
+		{
+			// ... fill in dA and dX (on GPU)
+			magma_ssetmatrix(lda, n, A, lda, dA, lda, queue); // copy A -> dA
+			magma_ssetmatrix(ldb, nrhs, B, ldb, dB, ldb, queue); // copy B -> dB
+		}
 
-		// ... fill in dA and dX (on GPU)
-		magma_ssetmatrix(lda, n, A, lda, dA, lda, queue); // copy A -> dA
-		magma_ssetmatrix(ldb, nrhs, B, ldb, dB, ldb, queue); // copy B -> dB
+		
 
 		/* Solve the equations A*X = B */
 		magma_sgels_gpu(magma_trans_t::MagmaNoTrans, m, n, nrhs, dA, lda, dB, ldb, work, lwork, &info);
@@ -518,12 +558,33 @@ namespace MagmaBinding
 			printf("the least squares solution could not be computed.\n");
 		}
 
-		//retrieve the results matrix X from GPU
-		magma_sgetmatrix(ldb, nrhs, dB, ldb, B, ldb, queue);
-		magma_sgetmatrix(lda, n, dA, lda, A, lda, queue);
 
+		if (rowmajor)
+		{
+			//retrieve the results matrix X from GPU
+			magma_sgetmatrix(ldb, nrhs, dB, ldb, Bt, ldb, queue);
+			magma_sgetmatrix(lda, n, dA, lda, At, lda, queue);
+
+			//
+			transpose(At, A, n, lda);
+			transpose(Bt, B, nrhs, ldb);
+		}
+		else
+		{
+			//retrieve the results matrix X from GPU
+			magma_sgetmatrix(ldb, nrhs, dB, ldb, B, ldb, queue);
+			magma_sgetmatrix(lda, n, dA, lda, A, lda, queue);
+
+		}
+
+		//Free memory
 		magma_free(dA);// free host memory
 		magma_free(dB);// free host memory
+		if (rowmajor)
+		{
+			magma_free(At);// free host memory
+			magma_free(Bt);// free host memory
+		}
 		magma_queue_destroy(queue); // destroy queue
 		magma_free_pinned(work); // free host memory
 		magma_finalize();
@@ -531,14 +592,14 @@ namespace MagmaBinding
 
 	}
 	
-	int mbv2dgels(int m, int n, int nrhs, double* A, int lda, double* B, int ldb)
+	int mbv2dgels(bool rowmajor, int m, int n, int nrhs, double* A, int lda, double* B, int ldb)
 	{
 		magma_init();
 		//declare helpers
 		int info;
 		int lwork = -1;
 		double wkopt;
-		double* work;
+		double* work, *At, *Bt;
 
 		/* Query and allocate the optimal workspace */
 		magma_dgels(magma_trans_t::MagmaNoTrans, m, n, nrhs, A, lda, B, ldb, &wkopt, lwork, &info);
@@ -546,9 +607,24 @@ namespace MagmaBinding
 		lwork = (int)wkopt;
 		work = (double*)malloc(lwork * sizeof(double));
 
+		if (rowmajor)
+		{
+			magma_dmalloc_pinned(&At, (const int)(lda * n));
+			magma_dmalloc_pinned(&Bt, (const int)(nrhs * m));
 
-		/* Solve the equations A*X = B */
-		magma_dgels(magma_trans_t::MagmaNoTrans, m, n, nrhs, A, lda, B, ldb, work, lwork, &info);
+			//before compute transpose the matrix into col major 
+			transpose(A, At, m, n);
+			transpose(B, Bt, m, nrhs);
+
+			/* Solve the equations A*X = B */
+			magma_dgels(magma_trans_t::MagmaNoTrans, m, n, nrhs, At, lda, Bt, ldb, work, lwork, &info);
+
+			//transpose results into row major matrix
+			transpose(Bt, B, nrhs, m);
+		}
+		else
+			/* Solve the equations A*X = B */
+			magma_dgels(magma_trans_t::MagmaNoTrans, m, n, nrhs, A, lda, B, ldb, work, lwork, &info);
 
 
 		/* Check for the full rank */
@@ -564,12 +640,12 @@ namespace MagmaBinding
 		return info;
 	}
 
-	int mbv2dgels_gpu(int m, int n, int nrhs, double* A, int lda, double* B, int ldb)
+	int mbv2dgels_gpu(bool rowmajor, int m, int n, int nrhs, double* A, int lda, double* B, int ldb)
 	{
 		magma_init();
 		//declare helpers
-		int ineg_one = -1;
-		int info;
+		const magma_int_t ineg_one = -1;
+		int info, lwork;
 		double wkopt[1];
 		double* work;
 		magma_queue_t queue = NULL;
@@ -579,19 +655,37 @@ namespace MagmaBinding
 		/* Query and allocate the optimal workspace */
 		magma_dgels_gpu(magma_trans_t::MagmaNoTrans, m, n, nrhs, NULL, lda, NULL, ldb, wkopt, ineg_one, &info);
 
-		int lwork = (int)MAGMA_D_REAL(wkopt[0]);
+		lwork = (magma_int_t)MAGMA_D_REAL(wkopt[0]);
 		magma_dmalloc_pinned(&work, lwork); // host memory for h_work
 
 		/* Copy matrix C from the CPU to the GPU */
-		double* dA, * dB;
+		double* dA, * dB, * At = NULL, * Bt = NULL;;
+		if (rowmajor)
+		{
+			magma_dmalloc_pinned(&At, (const int)(m * n));
+			magma_dmalloc_pinned(&Bt, (const int)(nrhs * m));
+			//
+			transpose(A, At, lda, n);
+			transpose(B, Bt, ldb, nrhs);
+		}
+
 		magma_dmalloc(&dA, (const int)(lda * n));
 		magma_dmalloc(&dB, (const int)(ldb * nrhs));
-		assert(dA != nullptr);
-		assert(dB != nullptr);
 
-		// ... fill in dA and dX (on GPU)
-		magma_dsetmatrix(m, n, A, lda, dA, lda, queue); // copy A -> dA
-		magma_dsetmatrix(ldb, nrhs, B, ldb, dB, ldb, queue); // copy B -> dB
+		if (rowmajor)
+		{
+			// ... fill in dA and dX (on GPU)
+			magma_dsetmatrix(lda, n, At, lda, dA, lda, queue); // copy A -> dA
+			magma_dsetmatrix(ldb, nrhs, Bt, ldb, dB, ldb, queue); // copy B -> dX
+		}
+		else
+		{
+			// ... fill in dA and dX (on GPU)
+			magma_dsetmatrix(lda, n, A, lda, dA, lda, queue); // copy A -> dA
+			magma_dsetmatrix(ldb, nrhs, B, ldb, dB, ldb, queue); // copy B -> dB
+		}
+
+
 
 		/* Solve the equations A*X = B */
 		magma_dgels_gpu(magma_trans_t::MagmaNoTrans, m, n, nrhs, dA, lda, dB, ldb, work, lwork, &info);
@@ -604,12 +698,33 @@ namespace MagmaBinding
 			printf("the least squares solution could not be computed.\n");
 		}
 
-		//retrieve the results matrix X from GPU
-		magma_dgetmatrix(ldb, nrhs, dB, ldb, B, ldb, queue);
-		magma_dgetmatrix(lda, n, dA, lda, A, lda, queue);
 
+		if (rowmajor)
+		{
+			//retrieve the results matrix X from GPU
+			magma_dgetmatrix(ldb, nrhs, dB, ldb, Bt, ldb, queue);
+			magma_dgetmatrix(lda, n, dA, lda, At, lda, queue);
+
+			//
+			transpose(At, A, n, lda);
+			transpose(Bt, B, nrhs, ldb);
+		}
+		else
+		{
+			//retrieve the results matrix X from GPU
+			magma_dgetmatrix(ldb, nrhs, dB, ldb, B, ldb, queue);
+			magma_dgetmatrix(lda, n, dA, lda, A, lda, queue);
+
+		}
+
+		//Free memory
 		magma_free(dA);// free host memory
 		magma_free(dB);// free host memory
+		if (rowmajor)
+		{
+			magma_free(At);// free host memory
+			magma_free(Bt);// free host memory
+		}
 		magma_queue_destroy(queue); // destroy queue
 		magma_free_pinned(work); // free host memory
 		magma_finalize();
@@ -618,16 +733,16 @@ namespace MagmaBinding
 	}
 
 	//EIGEN
-	int mbv2sgeevs(int n, float* A, int lda, float* wr, float* wi, float* Vl, int ldvl, float* Vr, int ldvr)
+	int mbv2sgeevs(bool rowmajor, int n, float* A, int lda, float* wr, float* wi, float* Vl, bool computeLeft, float* Vr, bool computeRight)
 	{
 		//left and right matrices
 		mbv2vector jjobvl = mbv2vector::MagmaNoVec;
 		mbv2vector jjobvr = mbv2vector::MagmaNoVec;
 
-		return mbv2sgeev(jjobvl, jjobvr, n, A, lda, wr, wi, Vl, ldvl, Vr, ldvr);
+		return mbv2sgeev(rowmajor, jjobvl, jjobvr, n, A, lda, wr, wi, Vl, n, Vr, n);
 	}
 	
-	int mbv2sgeev(mbv2vector jobvl, mbv2vector jobvr, int n, float* A, int lda, float* wr, float* wi, float* Vl, int ldvl,float* Vr, int ldvr)
+	int mbv2sgeev(bool rowmajor, mbv2vector jobvl, mbv2vector jobvr, int n, float* A, int lda, float* wr, float* wi, float* Vl, int ldvl,float* Vr, int ldvr)
 	{
 		magma_init();
 
@@ -641,15 +756,40 @@ namespace MagmaBinding
 		//query for workspace size
 		magma_int_t query_magma;
 		float dummy[1];
-		float* h_work; // h_work - workspace
+		float* h_work, * At = NULL, * Vlt = NULL, * Vrt = NULL; // h_work - workspace
 		int inf = magma_sgeev(jjobvl, jjobvr, n, NULL, lda, NULL, NULL, NULL, ldvl, NULL, ldvr, dummy, ineg_one, &info);
 
 		assert(inf == 0);
 		query_magma = (magma_int_t)MAGMA_D_REAL(dummy[0]);
 		magma_smalloc_pinned(&h_work, query_magma); // host memory for h_work
 
-		/* Compute EIGEN */
-		inf = magma_sgeev(jjobvl, jjobvr, n, A, lda, wr, wi, Vl, ldvr, Vr, ldvr, h_work, query_magma, &info);
+		if (rowmajor)
+		{
+			magma_smalloc_pinned(&At, (const int)(lda * n));
+			if (jjobvl == magma_vec_t::MagmaVec)
+				magma_smalloc_pinned(&Vlt, (const int)(lda * n));
+
+			if (jjobvr == magma_vec_t::MagmaVec)
+				magma_smalloc_pinned(&Vrt, (const int)(lda * n));
+
+			//before compute transpose the matrix into col major 
+			transpose(A, At, n, n);
+
+			/* Compute SVD */
+			inf = magma_sgeev(jjobvl, jjobvr, n, At, lda, wr, wi, Vlt, ldvr, Vrt, ldvr, h_work, query_magma, &info);
+
+			transpose(A, At, n, n);
+
+			if (jjobvl == magma_vec_t::MagmaVec)
+				transpose(Vlt, Vl, n, n);
+
+			if (jjobvr == magma_vec_t::MagmaVec)
+				transpose(Vrt, Vr, n, n);
+		}
+		else
+			/* Compute SVD */
+			inf = magma_sgeev(jjobvl, jjobvr, n, A, lda, wr, wi, Vl, ldvr, Vr, ldvr, h_work, query_magma, &info);
+
 
 		/* Check for convergence */
 		if (inf > 0) {
@@ -658,21 +798,28 @@ namespace MagmaBinding
 
 		// Free memory
 		magma_free_pinned(h_work); // free host memory
+		magma_free_pinned(At); // free host memory
+		magma_free_pinned(Vlt); // free host memory
+		magma_free_pinned(Vrt); // free host memory
 		magma_finalize(); // finalize Magma
 
 		return info;
 	}
 
-	int mbv2dgeevs(int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl, double* Vr, int ldvr)
+	int mbv2dgeevs(bool rowmajor, int n, double* A, int lda, double* wr, double* wi, double* Vl, bool computeLeft, double* Vr, bool computeRight)
 	{
 		//left and right matrices
 		mbv2vector jjobvl = mbv2vector::MagmaNoVec;
 		mbv2vector jjobvr = mbv2vector::MagmaNoVec;
-
-		return mbv2dgeev(jjobvl, jjobvr, n, A, lda, wr, wi, Vl, ldvl, Vr, ldvr);
+		if(computeLeft)
+			jjobvl = mbv2vector::MagmaVec;
+		if(computeRight)
+			jjobvl = mbv2vector::MagmaVec;
+		//
+		return mbv2dgeev(rowmajor, jjobvl, jjobvr, n, A, lda, wr, wi, Vl, n, Vr, n);
 	}
 
-	int mbv2dgeev(mbv2vector jobvl, mbv2vector jobvr, int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl,double* Vr, int ldvr)
+	int mbv2dgeev(bool rowmajor, mbv2vector jobvl, mbv2vector jobvr, int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl,double* Vr, int ldvr)
 	{
 		magma_init();
 
@@ -686,15 +833,40 @@ namespace MagmaBinding
 		//query for workspace size
 		magma_int_t query_magma;
 		double dummy[1];
-		double* h_work; // h_work - workspace
+		double* h_work, * At=NULL, * Vlt= NULL, * Vrt= NULL; // h_work - workspace
 		int inf = magma_dgeev(jjobvl, jjobvr, n, NULL, lda, NULL, NULL, NULL, ldvl, NULL, ldvr, dummy, ineg_one, &info);
 
 		assert(inf == 0);
 		query_magma = (magma_int_t)MAGMA_D_REAL(dummy[0]);
 		magma_dmalloc_pinned(&h_work, query_magma); // host memory for h_work
 
-		/* Compute SVD */
-		inf = magma_dgeev(jjobvl, jjobvr, n, A, lda, wr, wi, Vl, ldvr, Vr, ldvr, h_work, query_magma, &info);
+		if (rowmajor)
+		{
+			magma_dmalloc_pinned(&At, (const int)(lda * n));
+			if (jjobvl == magma_vec_t::MagmaVec)
+				magma_dmalloc_pinned(&Vlt, (const int)(lda * n));
+
+			if (jjobvr == magma_vec_t::MagmaVec)
+				magma_dmalloc_pinned(&Vrt, (const int)(lda * n));
+
+			//before compute transpose the matrix into col major 
+			transpose(A, At, n, n);
+
+			/* Compute SVD */
+			inf = magma_dgeev(jjobvl, jjobvr, n, At, lda, wr, wi, Vlt, ldvr, Vrt, ldvr, h_work, query_magma, &info);
+
+			transpose(A, At, n, n);
+			
+			if(jjobvl== magma_vec_t::MagmaVec)
+				transpose(Vlt, Vl, n, n);
+
+			if(jjobvr == magma_vec_t::MagmaVec)
+				transpose(Vrt, Vr, n, n);
+		}
+		else
+			/* Compute SVD */
+			inf = magma_dgeev(jjobvl, jjobvr, n, A, lda, wr, wi, Vl, ldvr, Vr, ldvr, h_work, query_magma, &info);
+		
 
 		/* Check for convergence */
 		if (inf > 0) {
@@ -703,6 +875,9 @@ namespace MagmaBinding
 
 		// Free memory
 		magma_free_pinned(h_work); // free host memory
+		magma_free_pinned(At); // free host memory
+		magma_free_pinned(Vlt); // free host memory
+		magma_free_pinned(Vrt); // free host memory
 		magma_finalize(); // finalize Magma
 
 		return info;
@@ -783,6 +958,29 @@ namespace MagmaBinding
 		}
 	}
 
+	/* Function to reverse arr[] from start to end*/
+	void reverseVector(float* arr, int start, int end)
+	{
+		while (start < end)
+		{
+			float temp = arr[start];
+			arr[start] = arr[end];
+			arr[end] = temp;
+			start++;
+			end--;
+		}
+	}
 
+	void reverseVector(double* arr, int start, int end)
+	{
+		while (start < end)
+		{
+			double temp = arr[start];
+			arr[start] = arr[end];
+			arr[end] = temp;
+			start++;
+			end--;
+		}
+	}
 }
 

@@ -47,7 +47,7 @@ void mv2sgeevs_cpu_test()
 	printf("mv2sgeevs_cpu test\n");
 
 	/* Solve eigenproblem */
-	info = mbv2sgeevs_cpu(n, a, lda,wr, wi, vl, ldvl, vr, ldvr);
+	info = mbv2sgeevs_cpu(false, n, a, lda,wr, wi, vl, ldvl, vr, ldvr);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -106,7 +106,7 @@ void mv2sgeevs_test()
 	printf("mv2sgeevs test\n");
 
 	/* Solve eigenproblem */
-	info = mbv2sgeevs(n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
+	info = mbv2sgeevs(false, n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -165,7 +165,7 @@ void mv2sgeev_cpu_test()
 	printf("mv2sgeev_cpu test\n");
 
 	/* Solve eigenproblem */
-	info = mbv2sgeev_cpu(jjobvl, jjobvr, n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
+	info = mbv2sgeev_cpu(false, 'N', 'N', n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -224,7 +224,7 @@ void mv2sgeev_test()
 	printf("mv2sgeev test\n");
 
 	/* Solve eigenproblem */
-	info = mbv2sgeev(jjobvl, jjobvr, n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
+	info = mbv2sgeev(false, jjobvl, jjobvr, n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -284,7 +284,7 @@ void mv2dgeevs_cpu_test()
 	printf("mv2dgeevs_cpu test\n");
 
 	/* Solve eigenproblem */
-	info = mbv2dgeevs_cpu( n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
+	info = mbv2dgeevs_cpu(false, n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -334,7 +334,7 @@ void mv2dgeevs_test()
 	printf("mv2dgeevs test\n");
 
 	/* Solve eigenproblem */
-	info = mbv2dgeevs( n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
+	info = mbv2dgeevs(false,  n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -384,7 +384,7 @@ void mv2dgeev_cpu_test()
 	printf("mv2dgeev_cpu test\n");
 
 	/* Solve eigenproblem */
-	info = mbv2dgeev_cpu(jjobvl, jjobvr,n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
+	info = mbv2dgeev_cpu(false, 'N', 'N',n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -434,7 +434,7 @@ void mv2dgeev_test()
 	printf("mv2dgeev test\n");
 
 	/* Solve eigenproblem */
-	info = mbv2dgeev(jjobvl,jjobvr,n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
+	info = mbv2dgeev(false, jjobvl,jjobvr,n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -487,7 +487,7 @@ void testSGEEV_float()
 	printf(" SGEEV Example Program Results\n");
 
 	/* Solve eigenproblem */
-	info = mbv2sgeev(jjobvl, jjobvr, n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
+	info = mbv2sgeev(false, jjobvl, jjobvr, n, a, lda, wr, wi, vl, ldvl, vr, ldvr);
 
 	/* Check for convergence */
 	if (info > 0) {

@@ -42,18 +42,18 @@ namespace MagmaBinding
 
 
 	//LSS - least squares solver
-	extern "C" MAGMABINDINGS_API int mbv2sgels(int m, int n, int nrhs, float* A, int lda, float* B, int lbd);
-	extern "C" MAGMABINDINGS_API int mbv2sgels_gpu(int m, int n, int nrhs, float* A, int lda, float* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2sgels(bool rowmajor, int m, int n, int nrhs, float* A, int lda, float* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2sgels_gpu(bool rowmajor, int m, int n, int nrhs, float* A, int lda, float* B, int lbd);
 
-	extern "C" MAGMABINDINGS_API int mbv2dgels(int m, int n, int nrhs, double* A, int lda, double* B, int lbd);
-	extern "C" MAGMABINDINGS_API int mbv2dgels_gpu(int m, int n, int nrhs, double* A, int lda, double* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2dgels(bool rowmajor, int m, int n, int nrhs, double* A, int lda, double* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2dgels_gpu(bool rowmajor, int m, int n, int nrhs, double* A, int lda, double* B, int lbd);
 
 	//EIGEN
-	extern "C" MAGMABINDINGS_API int mbv2sgeevs(int n, float* A, int lda, float* wr, float* wi, float* VL, int ldvl, float* VR, int ldvr);
-	extern "C" MAGMABINDINGS_API int mbv2sgeev(mbv2vector jobvl, mbv2vector jobvr, int n, float* A, int lda, float* wr, float* wi, float* Vl, int ldvl, float* Vr, int ldvr);
+	extern "C" MAGMABINDINGS_API int mbv2sgeevs(bool rowmajor, int n, float* A, int lda, float* wr, float* wi, float* Vl, bool computeLeft, float* Vr, bool computeRight);
+	extern "C" MAGMABINDINGS_API int mbv2sgeev(bool rowmajor, mbv2vector jobvl, mbv2vector jobvr, int n, float* A, int lda, float* wr, float* wi, float* Vl, int ldvl, float* Vr, int ldvr);
 	
-	extern "C" MAGMABINDINGS_API int mbv2dgeevs(int n, double* A, int lda, double* wr, double* wi, double* VL, int ldvl, double* VR, int ldvr);
-	extern "C" MAGMABINDINGS_API int mbv2dgeev(mbv2vector jobvl, mbv2vector jobvr, int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl, double* Vr, int ldvr);
+	extern "C" MAGMABINDINGS_API int mbv2dgeevs(bool rowmajor, int n, double* A, int lda, double* wr, double* wi, double* Vl, bool computeLeft, double* Vr, bool computeRight);
+	extern "C" MAGMABINDINGS_API int mbv2dgeev(bool rowMajor, mbv2vector jobvl, mbv2vector jobvr, int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl, double* Vr, int ldvr);
 
 
 }

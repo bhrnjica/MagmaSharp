@@ -40,7 +40,7 @@ void mv2sgels_test()
 	/* Executable statements */
 	printf("mbv2sgels test \n");
 
-	info = mbv2sgels(m, n, nrhs, a, lda, b, ldb);
+	info = mbv2sgels(false,m, n, nrhs, a, lda, b, ldb);
 
 	assert(0 == info);
 	assert(-0.45f == round_up(b[0], 2));
@@ -78,7 +78,7 @@ void mv2sgels_cpu_test()
 	/* Executable statements */
 	printf("mbv2sgels_cpu test \n");
 
-	info = mbv2sgels_cpu(m, n, nrhs, a, lda, b, ldb);
+	info = mbv2sgels_cpu(false, m, n, nrhs, a, lda, b, ldb);
 
 	assert(0 == info);
 	assert(-0.45f == round_up(b[0], 2));
@@ -116,7 +116,7 @@ void mv2sgels_gpu_test()
 	/* Executable statements */
 	printf("mbv2sgels_gpu test \n");
 
-	info = mbv2sgels_gpu(m, n, nrhs, a, lda, b, ldb);
+	info = mbv2sgels_gpu(false,m, n, nrhs, a, lda, b, ldb);
 
 	assert(0 == info);
 	assert(-0.45f == round_up(b[0], 2));
@@ -156,7 +156,7 @@ void mv2dgels_test()
 	/* Executable statements */
 	printf("mbv2dgels test \n");
 
-	info = mbv2dgels(m, n, nrhs, a, lda, b, ldb);
+	info = mbv2dgels(false,m, n, nrhs, a, lda, b, ldb);
 
 	assert(0 == info);
 	assert(-0.45 == round_up(b[0], 2));
@@ -195,7 +195,7 @@ void mv2dgels_cpu_test()
 	/* Executable statements */
 	printf("mbv2dgels_cpu test \n");
 
-	info = mbv2dgels_cpu(m, n, nrhs, a, lda, b, ldb);
+	info = mbv2dgels_cpu(false, m, n, nrhs, a, lda, b, ldb);
 
 	assert(0 == info);
 	assert(-0.45 == round_up(b[0], 2));
@@ -234,7 +234,7 @@ void mv2dgels_gpu_test()
 	/* Executable statements */
 	printf("mbv2dgels_gpu test \n");
 
-	info = mbv2dgels_gpu(m, n, nrhs, a, lda, b, ldb);
+	info = mbv2dgels_gpu(false,m, n, nrhs, a, lda, b, ldb);
 
 	assert(0 == info);
 	assert(-0.45 == round_up(b[0], 2));
@@ -275,7 +275,7 @@ void LSSTest_MV2_gpu()
 	/* Executable statements */
 	printf("mbv2sgels_gpu test\n");
 
-	info = mbv2sgels_gpu(m, n, nrhs, a, lda, b, ldb);
+	info = mbv2sgels_gpu(false, m, n, nrhs, a, lda, b, ldb);
 
 	/* Print least squares solution */
 	print_matrix((char*)"Least squares solution", n, nrhs, b, ldb);
@@ -305,7 +305,7 @@ void LSSTest_MV2_gpud()
 	/* Executable statements */
 	printf("mbv2dgels_gpu test\n");
 
-	info = mbv2dgels_gpu(m, n, nrhs, a, lda, b, ldb);
+	info = mbv2dgels_gpu(false,m, n, nrhs, a, lda, b, ldb);
 
 	/* Print least squares solution */
 	print_matrix((char*)"Least squares solution", n, nrhs, b, ldb);
@@ -337,7 +337,7 @@ void LSSTest_MV2_d()
 	/* Executable statements */
 	printf("mbv2dgels test\n");
 
-	info = mbv2dgels(m, n, nrhs, a, lda, b, ldb);
+	info = mbv2dgels(false,m, n, nrhs, a, lda, b, ldb);
 
 	/* Print least squares solution */
 	print_matrix((char*)"Least squares solution", n, nrhs, b, ldb);

@@ -22,7 +22,7 @@ namespace MagmaSharp.XUnit
             float[] result_wi = new float[] {10.76f, -10.76f, 4.70f, -4.70f, 0 };
 
             {
-                (float[] wr, float[] wi) = MagmaSharp.LinAlg.Eigen(A, Device.CPU);
+                (float[] wr, float[] wi, float[,] VL, float[,] VR) = MagmaSharp.LinAlg.Eigen(A,true, true, Device.CPU);
 
                 for (int i = 0; i < result_wr.Length; i++)
                     Assert.Equal(result_wr[i], wr[i], 2);
@@ -34,7 +34,7 @@ namespace MagmaSharp.XUnit
 
 
             {
-                (float[] wr, float[] wi) = MagmaSharp.LinAlg.Eigen(A, Device.GPU);
+                (float[] wr, float[] wi, float[,] VL, float [,] VR) = MagmaSharp.LinAlg.Eigen(A, true, true, Device.GPU);
 
                 for (int i = 0; i < result_wr.Length; i++)
                     Assert.Equal(result_wr[i], wr[i], 2);
@@ -45,7 +45,7 @@ namespace MagmaSharp.XUnit
             }
 
             {
-                (float[] wr, float[] wi) = MagmaSharp.LinAlg.Eigen(A, Device.CUSTOM);
+                (float[] wr, float[] wi, float[,] VL, float[,] VR) = MagmaSharp.LinAlg.Eigen(A,true, true, Device.CUSTOM);
 
                 for (int i = 0; i < result_wr.Length; i++)
                     Assert.Equal(result_wr[i], wr[i], 2);
@@ -73,7 +73,7 @@ namespace MagmaSharp.XUnit
             double[] result_wi = new double[] { 10.76f, -10.76f, 4.70f, -4.70f, 0 };
 
             {
-                (double[] wr, double[] wi) = MagmaSharp.LinAlg.Eigen(A, Device.CPU);
+                (double[] wr, double[] wi, double[,] VL, double[,] VR) = MagmaSharp.LinAlg.Eigen(A,true, true, Device.CPU);
 
                 for (int i = 0; i < result_wr.Length; i++)
                     Assert.Equal(result_wr[i], wr[i], 2);
@@ -85,7 +85,7 @@ namespace MagmaSharp.XUnit
 
 
             {
-                (double[] wr, double[] wi) = MagmaSharp.LinAlg.Eigen(A, Device.GPU);
+                (double[] wr, double[] wi, double[,] VL, double[,] VR) = MagmaSharp.LinAlg.Eigen(A, true, true, Device.GPU);
 
                 for (int i = 0; i < result_wr.Length; i++)
                     Assert.Equal(result_wr[i], wr[i], 2);
@@ -96,7 +96,7 @@ namespace MagmaSharp.XUnit
             }
 
             {
-                (double[] wr, double[] wi) = MagmaSharp.LinAlg.Eigen(A, Device.CUSTOM);
+                (double[] wr, double[] wi, double[,] VL, double[,] VR) = MagmaSharp.LinAlg.Eigen(A, true, true, Device.CUSTOM);
 
                 for (int i = 0; i < result_wr.Length; i++)
                     Assert.Equal(result_wr[i], wr[i], 2);

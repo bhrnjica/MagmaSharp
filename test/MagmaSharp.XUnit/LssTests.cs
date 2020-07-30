@@ -40,9 +40,9 @@ namespace MagmaSharp.XUnit
 
             var X = MagmaSharp.LinAlg.Lss(A, B, Device.CPU);
 
-            for (int i = 0; i < X.GetLength(0); i++)
+            for (int i = 0; i < result.GetLength(0); i++)
             {
-                for (int j = 0; j < X.GetLength(1); j++)
+                for (int j = 0; j < result.GetLength(1); j++)
                 {
                     Assert.Equal(X[i, j], result[i, j], 2);
                 }

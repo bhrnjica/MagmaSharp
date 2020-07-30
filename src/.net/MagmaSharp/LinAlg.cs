@@ -137,217 +137,153 @@ namespace MagmaSharp
 
         #region LSS - least square solver
         [DllImport("LapackBinding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2sgels_cpu(int m, int n, int nrhs, IntPtr A, int lda, IntPtr B, int lbd);
+        private static extern int mbv2sgels_cpu(bool rowmajor, int m, int n, int nrhs, float* A, int lda, float* B, int lbd);
         [DllImport("Magmav2Binding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2sgels(int m, int n, int nrhs, IntPtr A, int lda, IntPtr B, int lbd);
+        private static extern int mbv2sgels(bool rowmajor, int m, int n, int nrhs, float* A, int lda, float* B, int lbd);
         [DllImport("Magmav2Binding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2sgels_gpu(int m, int n, int nrhs, IntPtr A, int lda, IntPtr B, int lbd);
+        private static extern int mbv2sgels_gpu(bool rowmajor, int m, int n, int nrhs, float* A, int lda, float* B, int lbd);
 
         [DllImport("LapackBinding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2dgels_cpu(int m, int n, int nrhs, IntPtr A, int lda, IntPtr B, int lbd);
+        private static extern int mbv2dgels_cpu(bool rowmajor, int m, int n, int nrhs, double* A, int lda, double* B, int lbd);
         [DllImport("Magmav2Binding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2dgels(int m, int n, int nrhs, IntPtr A, int lda, IntPtr B, int lbd);
+        private static extern int mbv2dgels(bool rowmajor, int m, int n, int nrhs, double* A, int lda, double* B, int lbd);
         [DllImport("Magmav2Binding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2dgels_gpu(int m, int n, int nrhs, IntPtr A, int lda, IntPtr B, int lbd);
+        private static extern int mbv2dgels_gpu(bool rowmajor, int m, int n, int nrhs, double* A, int lda, double* B, int lbd);
 
         public static float[,] Lss(float[,] A, float[,] B, Device device = Device.DEFAULT)
         {
             //define parameters
+            int info = -1;
             int m = A.GetLength(0);
             int n = A.GetLength(1);
-            int ldb = B.GetLength(0);
-            int nhrs = B.GetLength(1);
-            int lda = m;
+            int nrhs = B.GetLength(1);
 
             //define arrays
-            int[] ipivv = new int[n];//permutation indices
-            float[] Af = Util.To1DArray<float>(A);
-            float[] Bf = Util.To1DArray<float>(B);
+            var Ac = A.Clone() as float[,];
+            var Bc = B.Clone() as float[,];
 
-            // Initialize unmanaged memory to hold the array.
-            //copy managed arrays to native prior to pInvoke call
-            IntPtr a = Marshal.AllocHGlobal(sizeof(float) * Af.Length);
-            IntPtr b = Marshal.AllocHGlobal(sizeof(float) * Bf.Length);
-            Marshal.Copy(Af, 0, a, Af.Length);
-            Marshal.Copy(Bf, 0, b, Bf.Length);
+            fixed (float* pA = Ac, pB = Bc)
+            {
+                //pInvoke call
+                if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
+                    info = mbv2sgels_gpu(true, m, n, nrhs, pA, m, pB, m);
+                else if (device == Device.CPU && _device == Device.GPU)
+                    info = mbv2sgels(true, m, n, nrhs, pA, m, pB, m);
+                else
+                    info = mbv2sgels_cpu(true, m, n, nrhs, pA, n, pB, nrhs);
 
-            //pInvoke call
-            int info = -1;
-            if ((device == Device.DEFAULT || device == Device.GPU) && _device==Device.GPU)
-                info = mbv2sgels_gpu(m, n, nhrs, a, lda, b, ldb);
-            else if (device == Device.CPU && _device == Device.GPU)
-                info = mbv2sgels(m, n, nhrs, a, lda, b, ldb);
-            else
-                info = mbv2sgels_cpu(m, n, nhrs, a, lda, b, ldb);
-            //
-            if (info != 0)
-                throw new Exception($"magma_sgesv failed due to invalid parameter {-info}.");
+                //
+                if (info != 0)
+                    throw new Exception($"magma_sgesv failed due to invalid parameter {-info}.");
 
-            //back the array from native to managed
-            //it should be transpose during creation as managed matrix array 
-            var X = Util.FromNativeToSArray(b, n, nhrs, ldb);
-
-            //Free memory
-            Marshal.FreeHGlobal(a);
-            Marshal.FreeHGlobal(b);
-            //
-            return X;
+                //X(n, nrhs) matrix is a submatrix of B(m, nrhs).
+                var X = new float[n,nrhs];
+                Array.Copy(Bc,X,n*nrhs);
+                return X;
+            }            
         }
 
         public static double[,] Lss(double[,] A, double[,] B, Device device = Device.DEFAULT)
         {
             //define parameters
+            int info = -1;
             int m = A.GetLength(0);
             int n = A.GetLength(1);
-            int ldb = B.GetLength(0);
-            int nhrs = B.GetLength(1);
-            int lda = m;
-
+            int nrhs = B.GetLength(1);
 
             //define arrays
-            int[] ipivv = new int[n];//permutation indices
-            double[] Af = Util.To1DArray<double>(A);
-            double[] Bf = Util.To1DArray<double>(B);
+            var Ac = A.Clone() as double[,];
+            var Bc = B.Clone() as double[,];
 
+            fixed (double* pA = Ac, pB = Bc)
+            {
+                //pInvoke call
 
-            // Initialize unmanaged memory to hold the array.
-            //copy managed arrays to native prior to pInvoke call
-            IntPtr a = Marshal.AllocHGlobal(sizeof(double) * Af.Length);
-            IntPtr b = Marshal.AllocHGlobal(sizeof(double) * Bf.Length);
-            Marshal.Copy(Af, 0, a, Af.Length);
-            Marshal.Copy(Bf, 0, b, Bf.Length);
+                if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
+                    info = mbv2dgels_gpu(true, m, n, nrhs, pA, m, pB, m);
+                else if (device == Device.CPU && _device == Device.GPU)
+                    info = mbv2dgels(true, m, n, nrhs, pA, m, pB, m);
+                else
+                    info = mbv2dgels_cpu(true, m, n, nrhs, pA, n, pB, nrhs);
 
-            //pInvoke call
-            int info = -1;
-            if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
-                info = mbv2dgels_gpu(m, n, nhrs, a, lda, b, ldb);
-            else if (device == Device.CPU && _device == Device.GPU)
-                info = mbv2dgels(m, n, nhrs, a, lda, b, ldb);
-            else
-                info = mbv2dgels_cpu(m, n, nhrs, a, lda, b, ldb);
-            //
-            if (info != 0)
-                throw new Exception($"magma_sgesv failed due to invalid parameter {-info}.");
+                //
+                if (info != 0)
+                    throw new Exception($"magma_dgesv failed due to invalid parameter {-info}.");
 
-            //back the array from native to managed
-            var X = Util.FromNativeToDArray(b, n, nhrs, ldb);
+                //X(n, nrhs) matrix is a submatrix of B(m, nrhs).
+                var X = new double[n, nrhs];
+                Array.Copy(Bc, X, n * nrhs);
+                return X;
+            }
 
-            //Free memory
-            Marshal.FreeHGlobal(a);
-            Marshal.FreeHGlobal(b);
-            //
-            return X;
         }
         #endregion
 
         #region Eigenvalues 
         [DllImport("LapackBinding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2sgeevs_cpu(int n, IntPtr A, int lda, IntPtr wr, IntPtr wi, IntPtr VL, int ldvl, IntPtr VR, int ldvr);
+        private static extern int mbv2sgeevs_cpu(bool rowmajor, int n, float* A, int lda, float* wr, float* wi, float* VL, bool computeLeft, float* VR, bool computerRight);
         [DllImport("Magmav2Binding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2sgeevs(int n, IntPtr A, int lda, IntPtr wr, IntPtr wi, IntPtr VL, int ldvl, IntPtr VR, int ldvr);
+        private static extern int mbv2sgeevs(bool rowmajor, int n, float* A, int lda, float* wr, float* wi, float* VL, bool computeLeft, float* VR, bool computerRight);
 
         [DllImport("LapackBinding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2dgeevs_cpu(int n, IntPtr A, int lda, IntPtr wr, IntPtr wi, IntPtr VL, int ldvl, IntPtr VR, int ldvr);
+        private static extern int mbv2dgeevs_cpu(bool rowmajor, int n, double* A, int lda, double* wr, double* wi, double* VL, bool computeLeft, double* VR, bool computerRight);
         [DllImport("Magmav2Binding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2dgeevs(int n, IntPtr A, int lda, IntPtr wr, IntPtr wi, IntPtr VL, int ldvl, IntPtr VR, int ldvr);
+        private static extern int mbv2dgeevs(bool rowmajor, int n, double* A, int lda, double* wr, double* wi, double* VL, bool computeLeft, double* VR, bool computerRight);
        
-        public static (float[] wr, float[] wi ) Eigen(float[,] A, Device device = Device.DEFAULT)
+        public static (float[] wr, float[] wi, float[,] VL, float[,] VR ) Eigen(float[,] A, bool computeLeft= false, bool computeRight= false, Device device = Device.DEFAULT)
         {
             //define parameters
+            int info = -1;
             int m = A.GetLength(0);
             if (m != A.GetLength(1))
                 throw new Exception("Matrix A must be squared!");
+
+            //define arrays
+            var Ac = A.Clone() as float[,];
+            var wr = new float[m];
+            var wi = new float[m];
+            var VL = new float[m, m];
+            var VR = new float[m, m];
+
+            fixed (float* pA = Ac, pwr = wr, pwi = wi, pVL = VL, pVR = VR)
+            {
+                if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
+                    info = mbv2sgeevs(true, m, pA, m, pwr, pwi, pVL, computeLeft, pVR, computeRight);
+                else if (device == Device.CPU && _device == Device.GPU)
+                    info = mbv2sgeevs(true, m, pA, m, pwr, pwi, pVL, computeLeft, pVR, computeRight);
+                else
+                    info = mbv2sgeevs_cpu(true, m, pA, m, pwr, pwi, pVL, computeLeft, pVR, computeRight);
+            }
             //
-            int lda = m;//Leading dimension for A
-            int ldvl = m;//Leading dimensions for VL
-            int ldvr = m;//Leading dimensions for VR
-
-            //create native arrays
-            IntPtr Af = Util.ToNativeSArray(A);
-            //
-            IntPtr pwr = Marshal.AllocHGlobal(sizeof(float) * m);
-            IntPtr pwi = Marshal.AllocHGlobal(sizeof(float) * m);
-            //IntPtr pVl = Marshal.AllocHGlobal(sizeof(double) * ldvl * m);
-            //IntPtr pVr = Marshal.AllocHGlobal(sizeof(double) * ldvr * m);
-
-            //pInvoke call
-            int info = -1;
-            if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
-                info = mbv2sgeevs(m, Af, lda, pwr, pwi, IntPtr.Zero, ldvl, IntPtr.Zero, ldvr);
-            else if (device == Device.CPU && _device == Device.GPU)
-                info = mbv2sgeevs(m, Af, lda, pwr, pwi, IntPtr.Zero, ldvl, IntPtr.Zero, ldvr);
-            else
-                info = mbv2sgeevs_cpu(m, Af, lda, pwr, pwi, IntPtr.Zero, ldvl, IntPtr.Zero, ldvr);
-
-            //
-            if (info != 0)
-                throw new Exception($"magma_sgesv failed due to invalid parameter {-info}.");
-
-            //back the array from native to managed
-           // var Am = Util.fromNativeToSArray(Af, m, m, lda);
-            var wr = Util.FromNativeToSArray(pwr, m);
-            var wi = Util.FromNativeToSArray(pwi, m);
-            //var Vl = Util.fromNativeToSArray(pVl, m, m, ldvl);
-            //var Vr = Util.fromNativeToSArray(pVr, m, m, ldvr);
-
-            ////Free memory
-            Marshal.FreeHGlobal(Af);
-            Marshal.FreeHGlobal(pwr);
-            Marshal.FreeHGlobal(pwi);
-            //Marshal.FreeHGlobal(pVl);
-            //Marshal.FreeHGlobal(pVr);
-            //
-            //return (Vl, Vr, wr, wi);
-            return (wr, wi);
+            return (wr, wi, VL, VR);
         }
 
-        public static (double[] wr, double[] wi) Eigen(double[,] A, Device device = Device.DEFAULT)
+        public static (double[] wr, double[] wi, double[,] VL, double[,] VR) Eigen(double[,] A, bool computeLeft, bool computeRight, Device device = Device.DEFAULT)
         {
             //define parameters
+            int info = -1;
             int m = A.GetLength(0);
             if (m != A.GetLength(1))
                 throw new Exception("Matrix A must be squared!");
-            //
-            int lda = m;//Leading dimension for A
-            int ldvl = m;//Leading dimensions for VL
-            int ldvr = m;//Leading dimensions for VR
 
-            //create native arrays
-            IntPtr Af = Util.ToNativeDArray(A);
-            //
-            IntPtr pwr = Marshal.AllocHGlobal(sizeof(double) * m);
-            IntPtr pwi = Marshal.AllocHGlobal(sizeof(double) * m);
-            //IntPtr pVl = Marshal.AllocHGlobal(sizeof(double) * ldvl * m);
-            //IntPtr pVr = Marshal.AllocHGlobal(sizeof(double) * ldvr * m);
+            //define arrays
+            var Ac = A.Clone() as double[,];
+            var wr = new double[m];
+            var wi = new double[m];
+            var VL = new double[m, m];
+            var VR = new double[m, m];
 
-            //pInvoke call
-            int info = -1;
-            if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
-                info = mbv2dgeevs(m, Af, lda, pwr, pwi, IntPtr.Zero, ldvl, IntPtr.Zero, ldvr);
-            else if (device == Device.CPU && _device == Device.GPU)
-                info = mbv2dgeevs(m, Af, lda, pwr, pwi, IntPtr.Zero, ldvl, IntPtr.Zero, ldvr);
-            else
-                info = mbv2dgeevs_cpu(m, Af, lda, pwr, pwi, IntPtr.Zero, ldvl, IntPtr.Zero, ldvr);
+            fixed (double* pA = Ac, pwr = wr, pwi = wi, pVL = VL, pVR = VR)
+            {
+                if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
+                    info = mbv2dgeevs(true, m, pA, m, pwr, pwi, pVL, computeLeft, pVR, computeRight);
+                else if (device == Device.CPU && _device == Device.GPU)
+                    info = mbv2dgeevs(true, m, pA, m, pwr, pwi, pVL, computeLeft, pVR, computeRight);
+                else
+                    info = mbv2dgeevs_cpu(true, m, pA, m, pwr, pwi, pVL, computeLeft, pVR, computeRight);
+            }
             //
-            if (info != 0)
-                throw new Exception($"magma_sgesv failed due to invalid parameter {-info}.");
-
-            //back the array from native to managed
-            var Am = Util.FromNativeToDArray(Af, m, m, lda);
-            var wr = Util.FromNativeToDArray(pwr, m);
-            var wi = Util.FromNativeToDArray(pwi, m);
-            //var Vl = Util.fromNativeToDArray(pVl, m, m, ldvl);
-            //var Vr = Util.fromNativeToDArray(pVr, m, m, ldvr);
-
-            ////Free memory
-            Marshal.FreeHGlobal(Af);
-            Marshal.FreeHGlobal(pwr);
-            Marshal.FreeHGlobal(pwi);
-            //Marshal.FreeHGlobal(pVl);
-            //Marshal.FreeHGlobal(pVr);
-            //
-            //return (Vl, Vr, wr, wi);
-            return (wr, wi);
+            return (wr, wi, VL, VR);
         }
         #endregion
 
