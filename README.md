@@ -1,6 +1,17 @@
 # MagmaSharp
-C# implementation High level API of Linear Algebra based on of Magma - linear algebra library for for hybrid manycore and GPU systems that can enable applications to fully exploit the power that each of the hybrid components offers.
-C# implementation of Magma - linear algebra library for for hybrid manycore and GPU systems that can enable applications to fully exploit the power that each of the hybrid components offers.
+.NET High Level API for MAGMA - .NET High Level API for MAGMA - Matrix Algebra for GPU and Multicore Architectures.
+The project is supposed to be High Level API which means not all methods and capabilities will be implemented. In fact only selected and most important method is going to be exposed in the .NET. 
+
+## Implementation
+Currently the library supports MAGMA driver routines for general rectangular matrix:
+
+1. ```gesv``` - solve linear system, AX = B, A is general non-symetric matrix,
+2. ```gels``` - least square solve, AX = B, A is rectangular,
+3. ```geev``` - eigen value solver for non-symetric matrix, AX = X lambda
+4. ```gesvd```- singular value decomposition (SVD), A) U SIgma V^2H.
+
+The library suppors `float` and `double` values types.
+
 
 
 # Software (Native Libraries) requirements
