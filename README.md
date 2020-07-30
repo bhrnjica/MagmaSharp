@@ -12,10 +12,15 @@ Currently the library supports MAGMA driver routines for general rectangular mat
 
 The library suppors `float` and `double` values types.
 
+# Software requirements
+
+The project is build on .NET Core 3.1 and .NET Standard 2.1. 
+
 # Software (Native Libraries) requirements
+In order to install and use the library the following Native library is needed to be installed. 
 
 - Intel MKL which can be downloaded at https://software.intel.com/content/www/us/en/develop/tools/math-kernel-library/choose-download.html
-- Magma 3.5.2 which can be  build from source code at https://bitbucket.org/icl/magma
+
 
 # How to Build MagmaSharp from the source
 
@@ -27,3 +32,4 @@ The library suppors `float` and `double` values types.
 3. Open 'MagmaSharp.Sln' with Visual Studio 2019.
 4. Make Sure the building architecture is x64.
 5. Build the Solution.
+
