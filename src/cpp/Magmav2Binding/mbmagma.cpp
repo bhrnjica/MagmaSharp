@@ -244,7 +244,7 @@ namespace MagmaBinding
 		else
 			jobV = mbv2vector::MagmaNoVec;
 		//
-		int lda = rowmajor  ? m : n;
+		int lda = m;
 		int ldu = m;
 		int ldvt = n;
 
@@ -349,7 +349,7 @@ namespace MagmaBinding
 		else
 			jobV = mbv2vector::MagmaNoVec;
 		//
-		int lda = rowmajor? m : n;
+		int lda = m;
 		int ldu = m;
 		int ldvt = n;
 
@@ -408,26 +408,24 @@ namespace MagmaBinding
 			printf("The algorithm computing SVD failed to converge.\n");
 		}
 
-
-		//transpose results into row major matrix
-		if (rowmajor)
-			transpose(At, A, m, n);
-
-		//transpose left orthonormal matrix
-		if (jobU == magma_vec_t::MagmaAllVec && rowmajor)
-			transpose(Ut, U, m, m);
-
-		//transpose left orthonormal matrix
-		if (jobV == magma_vec_t::MagmaAllVec )
-			transpose(VTt, VT, n, n);
-
-
-		/*print_matrix((char*)"Left Matrix U=",m,m,U, m);
-		print_matrix((char*)"RIGHT Matrix L=", n, n, VT, n);*/
-
 		// Free memory
 		if (rowmajor)
 		{
+			//transpose results into row major matrix
+			if (rowmajor)
+				transpose(At, A, m, n);
+
+			//transpose left orthonormal matrix
+			if (jobU == magma_vec_t::MagmaAllVec && rowmajor)
+				transpose(Ut, U, m, m);
+
+			//transpose left orthonormal matrix
+			if (jobV == magma_vec_t::MagmaAllVec)
+				transpose(VTt, VT, n, n);
+
+			/*print_matrix((char*)"Left Matrix U=",m,m,U, m);
+			print_matrix((char*)"RIGHT Matrix L=", n, n, VT, n);*/
+
 			magma_free_pinned(At); // free host memory
 			if (jobU == magma_vec_t::MagmaAllVec && rowmajor)
 				magma_free_pinned(Ut); // free host memory

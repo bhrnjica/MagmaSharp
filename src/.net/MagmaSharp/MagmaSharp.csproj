@@ -7,7 +7,7 @@
     <Authors>Bahrudin Hrnjica</Authors>
     <Company>bhrnjica</Company>
     <Copyright>2020</Copyright>
-    <Description>High level API for Magma linear Algebra on GPU.</Description>
+    <Description>MagmaSharp - .NET High Level API for MAGMA.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

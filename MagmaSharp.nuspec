@@ -2,21 +2,21 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
     <metadata>
         <id>MagmaSharp</id>
-        <version>0.01.17</version>
-        <authors>Bahrudin Hrnjica,</authors>
+        <version>0.02.01</version>
+        <authors>Bahrudin Hrnjica</authors>
         <owners>bhrnjica</owners>
         <projectUrl>https://github.com/bhrnjica/MagmaSharp</projectUrl>
 		<repository type="git" url="https://github.com/bhrnjica/magmasharp.git" />
 		<license type="expression">MIT</license>
         <requireLicenseAcceptance>true</requireLicenseAcceptance>
         <releaseNotes>Initial release for MagmaSharp.</releaseNotes>
-		<title>MagmaSharp - .NET High level API for MAGMA and Lapack.</title>
-        <description>MagmaSharp - .NET High level API for MAGMA and Lapack.</description>
-		<summary>MagmaSharp - High level API for MAGMA.</summary >
+		<title>MagmaSharp - .NET High Level API for MAGMA.</title>
+        <description>MagmaSharp - .NET High Level API for MAGMA.</description>
+		<summary>MagmaSharp is .NET High Level API for [MAGMA] - Matrix Algebra for GPU and Multicore Architectures. Only selected MAGMA routines are exposed in the API. Each method can run regardless of the CUDA present. In case the CUDA is not detected, the corresponded Lapack routine would to be executed.</summary >
         <copyright>Copyright ©2020 Bahrudin Hrnjica</copyright>
         <tags>magma, lapack, linear algebra</tags>
         <dependencies>
-			<group targetFramework=".NETStandard2.0" >
+			<group targetFramework=".NETStandard2.1" >
 				<dependency id="intelopenmp.redist.win" version="2020.2.254" />
 				<dependency id="inteltbb.redist.win" version="2020.3.254" />
 				<dependency id="intelmkl.redist.win-x64" version="2020.2.254" />	
@@ -27,7 +27,7 @@
     <files>
         <file src="README.MD"/>	
 		<file src="LICENSE"/>
-		<file src="src/.net/MagmaSharp/bin/x64/Release/netstandard2.0/MagmaSharp.dll" target="lib/netstandard2.0" />
+		<file src="src/.net/MagmaSharp/bin/x64/Release/netstandard2.1/MagmaSharp.dll" target="lib/netstandard2.1" />
 		<file src="lib/Magmav2Binding.dll" target="runtimes/win-x64/native" />
 		<file src="lib/LapackBinding.dll" target="runtimes/win-x64/native" />
     </files>

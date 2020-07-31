@@ -50,7 +50,7 @@ void mv2dgesvds_cpu_test()
 	printf("mbv2dgesvds_cpu test\n");
 
 	/* Compute SVD */
-	info = mbv2dgesvds_cpu(true, m, n, a, s, u, true, vt, true);
+	info = mbv2dgesvds_cpu(false, m, n, a, s, u, true, vt, true);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -408,7 +408,7 @@ void mv2sgesvds_test()
 	printf("mbv2sgesvds test\n");
 
 	/* Compute SVD */
-	info = mbv2sgesvds(true,m, n, a, s, u,true, vt, true);
+	info = mbv2sgesvds(false,m, n, a, s, u,true, vt, true);
 
 	/* Check for convergence */
 	if (info > 0) {
@@ -469,7 +469,7 @@ void mv2sgesvd_test()
 	printf("mbv2sgesvd test\n");
 
 	/* Compute SVD */
-	info = mbv2sgesvd(true,jobU, jobV, m, n, a, lda, s, u, ldu, vt, ldvt);
+	info = mbv2sgesvd(false,jobU, jobV, m, n, a, lda, s, u, ldu, vt, ldvt);
 
 	/* Check for convergence */
 	if (info > 0) {

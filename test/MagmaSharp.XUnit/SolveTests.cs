@@ -12,7 +12,6 @@ namespace MagmaSharp.XUnit
             const int n = 5;
             const int nrhs = 3;
             const int lda = n;
-            const int ldb = nrhs;
             int[] ipiv = new int[5];
 
             float[,] result = new float[n, nrhs]
