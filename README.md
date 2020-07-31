@@ -2,11 +2,11 @@
 .NET High Level API for MAGMA - Matrix Algebra for GPU and Multicore Architectures.
 The project is supposed to be High Level API which means not all methods and capabilities will be implemented. In fact only selected and most important method are going to be exposed on .NET platform. The Library can run regardless of the CUDA present. In case the CUDA is not detected, the corresponded Lapack routine will be executed. On this way, the library can be execution engine for other .NET High Level APIs and libraries.
 
-## About MAGMA- Matrix Algebra on GPU and Multicore Architectures
-The goal of the MAGMA project is to create a new generation of linear algebra libraries that achieves the fastest possible time to an accurate solution on heterogeneous architectures, starting with current multicore + multi-GPU systems.
-More information about MAGMA- can be found at https://icl.cs.utk.edu/magma/
+### What is MAGMA- Matrix Algebra on GPU and Multicore Architectures
+Magma is the open source project developed and maintened by University of Tennessee and several other Universities. The goal of the MAGMA project is to create a new generation of linear algebra libraries that achieves the fastest possible time to an accurate solution on heterogeneous architectures, starting with current multicore + multi-GPU systems.
+More information about MAGMA- can be found at https://icl.utk.edu/magma/software/index.html.
 
-## Implementation
+## Implementation of MagmaSharp
 Currently the library supports MAGMA driver routines for general rectangular matrix:
 
 1. ```gesv``` - solve linear system, AX = B, A is general non-symetric matrix,
@@ -14,7 +14,7 @@ Currently the library supports MAGMA driver routines for general rectangular mat
 3. ```geev``` - eigen value solver for non-symetric matrix, AX = X lambda
 4. ```gesvd```- singular value decomposition (SVD), A) U SIgma V^2H.
 
-The library supports `float` and `double` values types only.
+The library supports `float` and `double` value types only.
 
 # Software requirements
 
