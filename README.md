@@ -35,7 +35,7 @@ The package can be installed from this link, or just search MagmaSharp.
 ![Magma runtime location](img/magma_lib_location.jpg)
 Magma static library can be built from the official page.
 
-3. Open 'MagmaSharp.Sln' with Visual Studio 2019.
+3. Open 'MagmaSharp.sln' with Visual Studio 2019.
 4. Make Sure the building architecture is x64.
 5. Restore Nuget packages.
 5. Build and Run the Solution.,
