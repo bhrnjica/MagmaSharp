@@ -1,8 +1,6 @@
-MAGMA  2.3.0
-Matrix Algebra for GPU and Multicore Architectures
-----------------------------------------------------
-The static libraries can be compiled and build from the source code located at https://bitbucket.org/icl/magma. 
-The runtime library can be downloaded from various places on internet. One of the place is PyTorch repository.
+
+MAGMA runtime libraries can be compiled and build from the source code located at https://bitbucket.org/icl/magma. 
+However compiled windows static runtime libraries can be downloaded from several places on internet. One of the place is PyTorch repository.
 For more info please visit:
  https://github.com/pytorch/pytorch/tree/5f4a01b2ea1dde566ff9ddd79d68fc3db2c2820c/.jenkins/pytorch/win-test-helpers/installation-helpers. 
 
