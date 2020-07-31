@@ -46,6 +46,6 @@ Magma static library can be built from the official page.
 
 # How to Tutorials 
 
-In this section we are going to provide you with the instruction how you can use the Library in you .NET projects.
+In this section we are going to provide you with the instruction how you can use the Library in your .NET projects.
 
 
