@@ -1,8 +1,8 @@
 # MagmaSharp
-.NET High Level API for [MAGMA](https://icl.cs.utk.edu/projectsfiles/magma/doxygen/index.html) - Matrix Algebra for GPU and Multicore Architectures.
+**MagmaSharp** is .NET High Level API for [MAGMA](https://icl.cs.utk.edu/projectsfiles/magma/doxygen/index.html) - Matrix Algebra for GPU and Multicore Architectures.
 
 
-Only selected MAGMA routines are going to be exposed on .NET platform. The Library can run regardless of the CUDA present. In case the CUDA is not detected, the corresponded Lapack routine would be executed. On this way, the library can be execution engine for other .NET High Level APIs and libraries.
+Only selected MAGMA routines are exposed in the API. Each method can run regardless of the CUDA present. In case the CUDA is not detected, the corresponded Lapack routine would be executed. On this way, the library can be execution engine for other .NET High Level APIs and libraries.
 
 ## Implementation of MagmaSharp
 Currently the library supports MAGMA driver routines for general rectangular matrix:
