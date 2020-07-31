@@ -2,10 +2,6 @@
 .NET High Level API for MAGMA - Matrix Algebra for GPU and Multicore Architectures.
 The project is supposed to be High Level API which means not all methods and capabilities will be implemented. In fact only selected and most important method are going to be exposed on .NET platform. The Library can run regardless of the CUDA present. In case the CUDA is not detected, the corresponded Lapack routine will be executed. On this way, the library can be execution engine for other .NET High Level APIs and libraries.
 
-### What is MAGMA- Matrix Algebra on GPU and Multicore Architectures
-Magma is the open source project developed and maintened by University of Tennessee and several other Universities. The goal of the MAGMA project is to create a new generation of linear algebra libraries that achieves the fastest possible time to an accurate solution on heterogeneous architectures, starting with current multicore + multi-GPU systems.
-More information about MAGMA- can be found at https://icl.utk.edu/magma/software/index.html.
-
 ## Implementation of MagmaSharp
 Currently the library supports MAGMA driver routines for general rectangular matrix:
 
@@ -42,7 +38,12 @@ Magma static library can be built from the official page.
 3. Open 'MagmaSharp.Sln' with Visual Studio 2019.
 4. Make Sure the building architecture is x64.
 5. Restore Nuget packages.
-5. Build and Run the Solution.
+5. Build and Run the Solution.,
+
+### What is MAGMA- Matrix Algebra on GPU and Multicore Architectures
+Magma is the c/c++ open source project developed and maintened by University of Tennessee and several other Universities. The goal of the MAGMA project is to create a new generation of linear algebra libraries that achieves the fastest possible time to an accurate solution on heterogeneous architectures, starting with current multicore + multi-GPU systems.
+More information about MAGMA- can be found at https://icl.utk.edu/magma/software/index.html.
+
 
 # How to Tutorials 
 
