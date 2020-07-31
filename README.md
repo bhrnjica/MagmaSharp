@@ -2,7 +2,7 @@
 .NET High Level API for [MAGMA](https://icl.cs.utk.edu/projectsfiles/magma/doxygen/index.html) - Matrix Algebra for GPU and Multicore Architectures.
 Only selected MAGMA routines are going to be exposed on .NET platform. The Library can run regardless of the CUDA present. In case the CUDA is not detected, the corresponded Lapack routine would be executed. On this way, the library can be execution engine for other .NET High Level APIs and libraries.
 
-## Implementation
+## Implementation of MagmaSharp
 Currently the library supports MAGMA driver routines for general rectangular matrix:
 
 1. ```gesv``` - solve linear system, AX = B, A is general non-symetric matrix,
@@ -10,7 +10,7 @@ Currently the library supports MAGMA driver routines for general rectangular mat
 3. ```geev``` - eigen value solver for non-symetric matrix, AX = X lambda
 4. ```gesvd```- singular value decomposition (SVD), A) U SIgma V^2H.
 
-The library supports `float` and `double` values types only.
+The library supports `float` and `double` value types only.
 
 # Software requirements
 
@@ -35,7 +35,7 @@ The package can be installed from this link, or just search MagmaSharp.
 ![Magma runtime location](img/magma_lib_location.jpg)
 Magma static library can be built from the official page.
 
-3. Open 'MagmaSharp.Sln' with Visual Studio 2019.
+3. Open 'MagmaSharp.sln' with Visual Studio 2019.
 4. Make Sure the building architecture is x64.
 5. Restore Nuget packages.
 5. Build and Run the Solution.
