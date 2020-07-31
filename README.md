@@ -16,7 +16,7 @@ The library supports `float` and `double` value types only.
 
 # Software requirements
 
-The project is build on .NET Core 3.1 and .NET Standard 2.1. 
+The project is build on .NET Core 3.1 and .NET Standard 2.1. It is built and tested on Windows 10 1909 only. 
 
 # Software (Native Libraries) requirements
 In order to compile, build and use the library the following native libraries are needed to be installed. 
