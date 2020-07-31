@@ -2,9 +2,9 @@
 .NET High Level API for MAGMA - Matrix Algebra for GPU and Multicore Architectures.
 The project is supposed to be High Level API which means not all methods and capabilities will be implemented. In fact only selected and most important method are going to be exposed on .NET platform. The Library can run regardless of the CUDA present. In case the CUDA is not detected, the corresponded Lapack routine will be executed. On this way, the library can be execution engine for other .NET High Level APIs and libraries.
 
-## About MAGMA
+## About MAGMA- Matrix Algebra on GPU and Multicore Architectures
 The goal of the MAGMA project is to create a new generation of linear algebra libraries that achieves the fastest possible time to an accurate solution on heterogeneous architectures, starting with current multicore + multi-GPU systems.
-More information about MAGMA- can be found [here](https://icl.cs.utk.edu/projectsfiles/magma/doxygen/index.html)
+More information about MAGMA- can be found at https://icl.cs.utk.edu/magma/
 
 ## Implementation
 Currently the library supports MAGMA driver routines for general rectangular matrix:
