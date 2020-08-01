@@ -11,6 +11,7 @@
     <PackageReference Include="intelmkl.redist.win-x64" Version="2020.2.254" />
     <PackageReference Include="intelopenmp.redist.win" Version="2020.2.254" />
     <PackageReference Include="inteltbb.redist.win" Version="2020.3.254" />
+    <PackageReference Include="MathNet.Numerics" Version="4.11.0" />
   </ItemGroup>
 
   <ItemGroup>
