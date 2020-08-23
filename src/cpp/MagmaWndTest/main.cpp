@@ -8,21 +8,20 @@
 #include "MagmaDevice.h"
 #include "mbmagma.h"
 
-#include "magma_v2.h"
-#include "magma_lapack.h"
-#include "magmablas_d.h"
 
-#include "mkl_lapacke.h"
 using namespace MagmaBinding;
 #include "GSVTests.h"
 #include "SVDTests.h"
 #include "LSSTests.h"
 #include "EIGENTests.h"
-
+#include "MatrixTest.h"
 
 
 int main(int argc, char** argv)
 {
+	mv2sgemm_test_magma_row();
+	mv2sgemm_test_magma_col();
+
 	mbv2getdevice_arch();
 	//EIGEN
 	mv2sgeevs_cpu_test();

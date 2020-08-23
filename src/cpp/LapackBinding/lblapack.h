@@ -32,6 +32,13 @@ namespace LapackBinding
 		MagmaBacktransVec = 307   /* trevc */
 	};
 
+	enum class mbv2trans
+	{
+		NoTrans,//none
+		Trans,//transpose the matrix before operations
+		ConjTrans,//not supported yet
+	};
+
 	char convertToChar(mbv2vector vec);
 
 	//AX=B - solver
@@ -60,4 +67,6 @@ namespace LapackBinding
 	extern "C" MAGMABINDINGS_API int mbv2dgeevs_cpu(bool rowmajor, int n, double* A, int lda, double* wr, double* wi, double* VL, bool computeLeft, double* VR, bool computeRight);
 	extern "C" MAGMABINDINGS_API int mbv2dgeev_cpu(bool rowmajor, char jobvl, char jobvr, int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl, double* Vr, int ldvr);
 
+	//Matrix-Matrix operations
+	extern "C" MAGMABINDINGS_API void mbv2sgemm_cpu(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc);
 }

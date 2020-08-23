@@ -55,5 +55,8 @@ namespace MagmaBinding
 	extern "C" MAGMABINDINGS_API int mbv2dgeevs(bool rowmajor, int n, double* A, int lda, double* wr, double* wi, double* Vl, bool computeLeft, double* Vr, bool computeRight);
 	extern "C" MAGMABINDINGS_API int mbv2dgeev(bool rowMajor, mbv2vector jobvl, mbv2vector jobvr, int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl, double* Vr, int ldvr);
 
+	//Matrix-Matrix operations
+	extern "C" MAGMABINDINGS_API void mbv2sgemm(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc);
+
 
 }

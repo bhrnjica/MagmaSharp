@@ -3,8 +3,9 @@
 #include "lblapack.h"
 #include <stdio.h>
 #include <mkl_lapacke.h>
+#include <mkl_cblas.h>
 #include <crtdbg.h>
-
+ 
 namespace LapackBinding
 {
 	extern void print_matrix(char* desc, int m, int n, float* a, const int lda);
@@ -252,6 +253,36 @@ namespace LapackBinding
 
 		//
 		return info;
+	}
+
+	//Matrix-Matrix operations
+	void mbv2sgemm_cpu(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, float alpha,const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc)
+	{
+		CBLAS_TRANSPOSE trA = CBLAS_TRANSPOSE::CblasNoTrans;
+		CBLAS_TRANSPOSE trB = CBLAS_TRANSPOSE::CblasNoTrans;
+
+		if (opA == mbv2trans::Trans)
+			trA = CBLAS_TRANSPOSE::CblasTrans;
+		else if (opA == mbv2trans::ConjTrans)
+			throw WS_E_NOT_SUPPORTED;
+
+		if (opB == mbv2trans::Trans)
+			trB = CBLAS_TRANSPOSE::CblasTrans;
+		else if (opB == mbv2trans::ConjTrans)
+			throw WS_E_NOT_SUPPORTED;
+
+
+		if (rowmajor)
+		{
+			
+			cblas_sgemm(CBLAS_LAYOUT::CblasColMajor, trA, trB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+		}
+		else
+		{
+			cblas_sgemm(CBLAS_LAYOUT::CblasRowMajor, trA, trB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+		}
+
+		
 	}
 
 	//Util

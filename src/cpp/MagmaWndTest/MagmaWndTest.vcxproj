@@ -168,6 +168,7 @@ copy /Y "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\red
     <ClCompile Include="HelperTest.cpp" />
     <ClCompile Include="LSSTests.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MatrixTest.cpp" />
     <ClCompile Include="SVDTests.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +176,7 @@ copy /Y "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\red
     <ClInclude Include="GSVTests.h" />
     <ClInclude Include="HelperTest.h" />
     <ClInclude Include="LSSTests.h" />
+    <ClInclude Include="MatrixTest.h" />
     <ClInclude Include="SVDTests.h" />
   </ItemGroup>
   <ItemGroup>

@@ -107,25 +107,25 @@ void print_int_vector(char* desc, int n, int* a) {
 }
 
 
-void print_matrix(char* desc, int m, int n, double* a, const int lda) {
+void print_matrix(char* desc, int m, int n, double* a, const int lda, bool colMajor ) {
 	int i, j;
 	printf("\n %s\n", desc);
 	for (i = 0; i < m; i++)
 	{
 		for (j = 0; j < n; j++)
-			printf(" %6.2f", a[i + j * lda]);
+			colMajor ? printf(" %6.2f", a[i + j * lda]) : printf(" %6.2f", a[i * lda + j]);
 
 		printf("\n");
 	}
 }
 
-void print_matrix(char* desc, int m, int n, float* a, const int lda) {
+void print_matrix(char* desc, int m, int n, float* a, const int lda, bool colMajor ) {
 	int i, j;
 	printf("\n %s\n", desc);
 	for (i = 0; i < m; i++)
 	{
 		for (j = 0; j < n; j++)
-			printf(" %6.2f", a[i + j * lda]);
+			colMajor ? printf(" %6.2f", a[i + j * lda]): printf(" %6.2f", a[i*lda + j]);
 
 		printf("\n");
 	}
