@@ -967,6 +967,91 @@ namespace MagmaBinding
 		return;
 	}
 
+	void mbv2dgemm(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc)
+	{
+		magma_init();
+
+		magma_trans_t trA = magma_trans_t::MagmaNoTrans;
+		magma_trans_t trB = magma_trans_t::MagmaNoTrans;
+		//
+		magma_queue_t queue = NULL;
+		magma_int_t dev = 0;
+		magma_queue_create(dev, &queue);
+
+		//
+		if (opA == mbv2trans::Trans)
+			trA = magma_trans_t::MagmaTrans;
+		else if (opA == mbv2trans::ConjTrans)
+			throw WS_E_NOT_SUPPORTED;
+
+		if (opB == mbv2trans::Trans)
+			trB = magma_trans_t::MagmaTrans;
+		else if (opB == mbv2trans::ConjTrans)
+			throw WS_E_NOT_SUPPORTED;
+
+
+		/* Copy matrices A and B from the CPU to the GPU */
+		double* dA, * dB, * dC, * At = NULL, * Bt = NULL, * Ct = NULL;
+		if (rowmajor)
+		{
+			magma_dmalloc_pinned(&At, (const int)(k * m));
+			magma_dmalloc_pinned(&Bt, (const int)(k * n));
+			magma_dmalloc_pinned(&Ct, (const int)(n * m));
+			//
+			transpose((double*)A, At, m, k);
+			transpose((double*)B, Bt, k, n);
+			transpose((double*)C, Ct, m, n);
+
+			magma_dmalloc(&dA, (const int)(k * m));
+			magma_dmalloc(&dB, (const int)(n * k));
+			magma_dmalloc(&dC, (const int)(n * m));
+
+			// ... fill in dA and dX (on GPU)
+			magma_dsetmatrix(m, k, At, lda, dA, lda, queue); // copy A -> dA
+			magma_dsetmatrix(k, n, Bt, ldb, dB, ldb, queue); // copy B -> dX
+			magma_dsetmatrix(m, n, Ct, ldc, dC, ldc, queue); // copy C -> dC
+
+		}
+		else
+		{
+			magma_dmalloc(&dA, (const int)(m * k));
+			magma_dmalloc(&dB, (const int)(k * n));
+			magma_dmalloc(&dC, (const int)(m * n));
+
+			// ... fill in dA and dX (on GPU)
+			magma_dsetmatrix(m, k, A, lda, dA, lda, queue); // copy A -> dA
+			magma_dsetmatrix(k, n, B, ldb, dB, ldb, queue); // copy B -> dB
+			magma_dsetmatrix(m, n, C, ldc, dC, ldc, queue); // copy C -> dC
+		}
+
+		//
+		magmablas_dgemm(trA, trB, m, n, k, alpha, dA, lda, dB, ldb, beta, dC, ldc, queue);
+
+
+		if (rowmajor)
+		{
+			magma_dgetmatrix(m, n, dC, ldc, Ct, ldc, queue);
+			transpose(Ct, C, n, ldc);
+		}
+		else
+		{
+			//retrieve the results matrix C from GPU
+			magma_dgetmatrix(m, n, dC, ldc, C, ldc, queue);
+		}
+
+
+		magma_free(dA);// free host memory
+		magma_free(dB);// free host memory
+		magma_free(dC);// free host memory
+
+		magma_free_pinned(At);
+		magma_free_pinned(Bt);
+
+		magma_queue_destroy(queue); // destroy queue
+		magma_finalize();
+		return;
+	}
+
 	//Util
 	magma_vec_t convertToVec(mbv2vector vec)
 	{

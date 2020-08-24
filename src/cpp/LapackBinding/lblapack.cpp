@@ -285,7 +285,85 @@ namespace LapackBinding
 		
 	}
 
+	void mbv2dgemm_cpu(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc)
+	{
+		CBLAS_TRANSPOSE trA = CBLAS_TRANSPOSE::CblasNoTrans;
+		CBLAS_TRANSPOSE trB = CBLAS_TRANSPOSE::CblasNoTrans;
+
+		if (opA == mbv2trans::Trans)
+			trA = CBLAS_TRANSPOSE::CblasTrans;
+		else if (opA == mbv2trans::ConjTrans)
+			throw WS_E_NOT_SUPPORTED;
+
+		if (opB == mbv2trans::Trans)
+			trB = CBLAS_TRANSPOSE::CblasTrans;
+		else if (opB == mbv2trans::ConjTrans)
+			throw WS_E_NOT_SUPPORTED;
+
+
+		if (rowmajor)
+		{
+
+			cblas_dgemm(CBLAS_LAYOUT::CblasRowMajor, trA, trB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+		}
+		else
+		{
+			cblas_dgemm(CBLAS_LAYOUT::CblasColMajor, trA, trB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+		}
+
+
+	}
+
+	void mbv2stranspose_cpu(bool rowmajor, int m, int n, const float* A, int lda, float* At, int ldat)
+	{
+
+		if (rowmajor)
+		{
+			transpose(A, At, m, n);
+		}
+		else
+		{
+			transpose(A, At, n, m);
+		}
+	}
+
+	void mbv2dtranspose_cpu(bool rowmajor, int m, int n, const double* A, int lda, double* At, int ldat)
+	{
+
+		if (rowmajor)
+		{
+			transpose(A, At, m, n);
+		}
+		else
+		{
+			transpose(A, At, n, m);
+		}
+	}
+
 	//Util
+
+	void transpose(const float* src, float* dst, const int N, const int M)
+	{
+#pragma omp parallel for
+		for (int n = 0; n < N * M; n++)
+		{
+			int i = n / N;
+			int j = n % N;
+			dst[n] = src[M * j + i];
+		}
+	}
+
+	void transpose(const double* src, double* dst, const int N, const int M)
+	{
+#pragma omp parallel for
+		for (int n = 0; n < N * M; n++)
+		{
+			int i = n / N;
+			int j = n % N;
+			dst[n] = src[M * j + i];
+		}
+	}
+
 	char convertToChar(mbv2vector vec)
 	{
 		switch (vec)

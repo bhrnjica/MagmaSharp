@@ -38,8 +38,10 @@ namespace LapackBinding
 		Trans,//transpose the matrix before operations
 		ConjTrans,//not supported yet
 	};
-
+	//
 	char convertToChar(mbv2vector vec);
+	void transpose(const float* src, float* dst, const int N, const int M);
+	void transpose(const double* src, double* dst, const int N, const int M);
 
 	//AX=B - solver
 	extern "C" MAGMABINDINGS_API int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int ldb);
@@ -69,4 +71,7 @@ namespace LapackBinding
 
 	//Matrix-Matrix operations
 	extern "C" MAGMABINDINGS_API void mbv2sgemm_cpu(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc);
+	extern "C" MAGMABINDINGS_API void mbv2dgemm_cpu(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc);
+	extern "C" MAGMABINDINGS_API void mbv2stranspose_cpu(bool rowmajor, int m, int n, const float* A, int lda, float* At, int ldat);
+	extern "C" MAGMABINDINGS_API void mbv2dtranspose_cpu(bool rowmajor, int m, int n, const double* A, int lda, double* At, int ldat);
 }

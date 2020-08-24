@@ -29,6 +29,17 @@ int main(int argc, char** argv)
 	mv2sgemm_test_lapack_row();
 	mv2sgemm_test_lapack_col();
 
+	mv2dgemm_test_magma_col_01();
+	mv2dgemm_test_magma_row_01();
+	mv2dgemm_test_magma_row();
+	mv2dgemm_test_magma_col();
+	   
+	mv2dgemm_test_lapack_col_01();
+	mv2dgemm_test_lapack_row_01();
+	mv2dgemm_test_lapack_row();
+	mv2dgemm_test_lapack_col();
+
+
 
 	mbv2getdevice_arch();
 	//EIGEN
