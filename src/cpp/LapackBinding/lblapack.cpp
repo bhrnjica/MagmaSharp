@@ -275,11 +275,11 @@ namespace LapackBinding
 		if (rowmajor)
 		{
 			
-			cblas_sgemm(CBLAS_LAYOUT::CblasColMajor, trA, trB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+			cblas_sgemm(CBLAS_LAYOUT::CblasRowMajor, trA, trB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 		}
 		else
 		{
-			cblas_sgemm(CBLAS_LAYOUT::CblasRowMajor, trA, trB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+			cblas_sgemm(CBLAS_LAYOUT::CblasColMajor, trA, trB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 		}
 
 		
