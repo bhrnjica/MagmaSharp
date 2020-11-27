@@ -135,5 +135,35 @@ namespace MagmaSharp.XUnit
             //}
 
         }
+
+        [Fact]
+        public void SimpleRegression_Test()
+        {
+            //Solving simple linear regression od type
+            // Yhat=b0+b1X
+            /* Local arrays */
+            double[,] A = new double[,]
+            {   //b0    b1
+                {1.0f, 1.0f},
+                {1.0f, 2.0f},
+                {1.0f, 3.0f},
+                {1.0f, 4.0f},
+            };
+
+            /*  */
+            double[,] B = new double[,]
+            {   //Y
+                { 6.0} ,
+                { 5.0} ,
+                { 7.0} ,
+                {10.0} ,
+
+            };
+
+            var X = MagmaSharp.LinAlg.Lss(A, B, Device.CPU);
+
+            Assert.Equal(3.5f, X[0,1]);
+            Assert.Equal(1.4f, X[1, 0]);
+        }
     }
 }
