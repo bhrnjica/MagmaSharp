@@ -83,3 +83,4 @@
 /nuget/MagmaSharp.0.2.1.nupkg
 /src/.net/LapackSharp/bin/x64/Debug/netstandard2.1
 /src/.net/LapackSharp/obj
+/src/.net/LapackSharp/bin
