@@ -310,19 +310,46 @@ namespace LapackSharp
         /// <param name="alpha"></param>
         /// <param name="betta"></param>
         /// <returns></returns>
-        public static float[,] MMult(float[,] A, float[,] B, float alpha=1, float betta= 1)
+        public static float[,] MMult(float[,] A, float[,] B,float[,] C=null, float alpha=1, float betta= 1)
         {
             //define parameters
             int m = A.GetLength(0);
             int k = A.GetLength(1);
             int n = B.GetLength(1);
+            if (C != null && (C.GetLength(0) != m || C.GetLength(1) != n))
+                throw new Exception($"C matrix has wrong format. The format should be ({m},{n})");
+
             //const int lda = k, ldb = n, ldc = n;
 
             var Ac = A.Clone() as float[,];
             var Bc = B.Clone() as float[,];
-            var Cc = new float[m, n];
+            var Cc = C == null ? new float[m, n] : C.Clone() as float[,];
             //define arrays
             fixed (float* pA = Ac, pB = Bc, pC=Cc)
+            {
+                //pInvoke call
+                mbv2sgemm_cpu(true, m, n, k, alpha, pA, k, pB, n, betta, pC, n);
+            }
+            //
+            return Cc;
+        }
+
+        public static float[] MMult(float[,] A, float[] B, float[] C = null, float alpha = 1, float betta = 1)
+        {
+            //define parameters
+            int m = A.GetLength(0);
+            int k = A.GetLength(1);
+            int n = 1;
+            if (C != null && C.Length != m)
+                throw new Exception($"C matrix has wrong format. The format should be ({m})");
+            //const int lda = k, ldb = n, ldc = n;
+
+            var Ac = A.Clone() as float[,];
+            var Bc = B.Clone() as float[];
+            var Cc = C == null ? new float[m] : C.Clone() as float[];
+
+            //define arrays
+            fixed (float* pA = Ac, pB = Bc, pC = Cc)
             {
                 //pInvoke call
                 mbv2sgemm_cpu(true, m, n, k, alpha, pA, k, pB, n, betta, pC, n);
@@ -364,6 +391,30 @@ namespace LapackSharp
             var Bc = B.Clone() as double[,];
             var Cc = C==null? new double[m,n]: C.Clone() as double[,];
             
+            //define arrays
+            fixed (double* pA = Ac, pB = Bc, pC = Cc)
+            {
+                //pInvoke call
+                mbv2dgemm_cpu(true, m, n, k, alpha, pA, k, pB, n, betta, pC, n);
+            }
+            //
+            return Cc;
+        }
+
+        public static double[] MMult(double[,] A, double[] B, double[] C = null, double alpha = 1, double betta = 1)
+        {
+            //define parameters
+            int m = A.GetLength(0);
+            int k = A.GetLength(1);
+            int n = 1;
+            if (C != null && C.Length != m)
+                throw new Exception($"C matrix has wrong format. The format should be ({m})");
+            //const int lda = k, ldb = n, ldc = n;
+
+            var Ac = A.Clone() as double[,];
+            var Bc = B.Clone() as double[];
+            var Cc = C == null ? new double[m] : C.Clone() as double[];
+
             //define arrays
             fixed (double* pA = Ac, pB = Bc, pC = Cc)
             {

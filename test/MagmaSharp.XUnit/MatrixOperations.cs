@@ -99,6 +99,69 @@ namespace MagmaSharp.XUnit
             }
         }
 
+
+        [Fact]
+        public void MultiplicationTest_04()
+        {
+            var A = new double[3, 5]
+                {
+                {1,   2,   3,   4,   5 },
+                {6,   7,   8,   9,   10 },
+                { 11,  12,  13,  14,  15 }
+                 };
+            var B = new double[5] {1,3,5,7,9 };
+
+            var C = LapackSharp.LinAlg.MMult(A, B);
+            var result = new double[3]{95,220,345 };
+
+            for (int i = 0; i < C.GetLength(0); i++)
+            {
+                Assert.Equal(C[i], result[i], 2);
+            }
+        }
+        [Fact]
+        public void MultiplicationTest_064()
+        {
+            var alpha = 2.0;
+            var betta = 3.0;
+
+            var A = new double[3, 5]
+                {
+                {1,   2,   3,   4,   5 },
+                {6,   7,   8,   9,   10 },
+                { 11,  12,  13,  14,  15 }
+                 };
+            var B = new double[5] { 1, 3, 5, 7, 9 };
+            var C = new double[3] { 12, 13, 14 };
+            var D = LapackSharp.LinAlg.MMult(A, B, C, alpha,betta);
+            var result = new double[3] { 226, 479, 732 };
+
+            for (int i = 0; i < D.GetLength(0); i++)
+            {
+                Assert.Equal(D[i], result[i], 2);
+            }
+        }
+
+        [Fact]
+        public void MultiplicationTest_05()
+        {
+            var A = new float[3, 5]
+                {
+                {1,   2,   3,   4,   5 },
+                {6,   7,   8,   9,   10 },
+                { 11,  12,  13,  14,  15 }
+                 };
+            var B = new float[5] { 1, 3, 5, 7, 9 };
+
+            var C = LapackSharp.LinAlg.MMult(A, B);
+            var result = new float[3] { 95, 220, 345 };
+
+            for (int i = 0; i < C.GetLength(0); i++)
+            {
+                Assert.Equal(C[i], result[i], 2);
+            }
+        }
+
         [Fact]
         public void MultiplicationTest_02()
         {
