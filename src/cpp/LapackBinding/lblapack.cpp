@@ -256,12 +256,12 @@ namespace LapackBinding
 	}
 
 	//Matrix-Matrix operations
-	void mbv2sgemm_cpu(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, float alpha,const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc)
+	void mbv2sgemm_cpu(bool rowmajor, int m, int n, int k, float alpha,const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc)
 	{
 		CBLAS_TRANSPOSE trA = CBLAS_TRANSPOSE::CblasNoTrans;
 		CBLAS_TRANSPOSE trB = CBLAS_TRANSPOSE::CblasNoTrans;
 
-		if (opA == mbv2trans::Trans)
+		/*if (opA == mbv2trans::Trans)
 			trA = CBLAS_TRANSPOSE::CblasTrans;
 		else if (opA == mbv2trans::ConjTrans)
 			throw WS_E_NOT_SUPPORTED;
@@ -269,7 +269,7 @@ namespace LapackBinding
 		if (opB == mbv2trans::Trans)
 			trB = CBLAS_TRANSPOSE::CblasTrans;
 		else if (opB == mbv2trans::ConjTrans)
-			throw WS_E_NOT_SUPPORTED;
+			throw WS_E_NOT_SUPPORTED;*/
 
 
 		if (rowmajor)
@@ -285,12 +285,12 @@ namespace LapackBinding
 		
 	}
 
-	void mbv2dgemm_cpu(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc)
+	void mbv2dgemm_cpu(bool rowmajor, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc)
 	{
 		CBLAS_TRANSPOSE trA = CBLAS_TRANSPOSE::CblasNoTrans;
 		CBLAS_TRANSPOSE trB = CBLAS_TRANSPOSE::CblasNoTrans;
 
-		if (opA == mbv2trans::Trans)
+		/*if (opA == mbv2trans::Trans)
 			trA = CBLAS_TRANSPOSE::CblasTrans;
 		else if (opA == mbv2trans::ConjTrans)
 			throw WS_E_NOT_SUPPORTED;
@@ -298,7 +298,7 @@ namespace LapackBinding
 		if (opB == mbv2trans::Trans)
 			trB = CBLAS_TRANSPOSE::CblasTrans;
 		else if (opB == mbv2trans::ConjTrans)
-			throw WS_E_NOT_SUPPORTED;
+			throw WS_E_NOT_SUPPORTED;*/
 
 
 		if (rowmajor)
@@ -309,6 +309,7 @@ namespace LapackBinding
 		else
 		{
 			cblas_dgemm(CBLAS_LAYOUT::CblasColMajor, trA, trB, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+
 		}
 
 
@@ -338,6 +339,61 @@ namespace LapackBinding
 		{
 			transpose(A, At, n, m);
 		}
+	}
+
+	//Inverse matrix
+	int mbv2sinverse_cpu(bool rowmajor, int n, float* A, int lda)
+	{
+		int info;
+		int* ipiv = (int*)malloc(n * sizeof(int));
+		
+		if (rowmajor)
+		{
+			LAPACKE_sgetrf(LAPACK_ROW_MAJOR,n, n, A, n,ipiv);
+			info = LAPACKE_sgetri(LAPACK_ROW_MAJOR, n, A, lda, ipiv);
+			// Error checking
+			if (info > 0)
+			{
+				return info;
+			}
+		}
+		else
+		{
+			info = LAPACKE_sgetrf(LAPACK_COL_MAJOR, n, n, A, n, ipiv);
+			if (info > 0)
+			{
+				return info;
+			}
+			info = LAPACKE_sgetri(LAPACK_COL_MAJOR, n, A, lda, ipiv);
+		}
+		free(ipiv);
+		return info;
+	}
+
+	int mbv2dinverse_cpu(bool rowmajor, int n, double* A, int lda)
+	{
+		int info;
+		int* ipiv = (int*)malloc(n * sizeof(int));
+		if (rowmajor)
+		{
+			info = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, n, n, A, n, ipiv);
+			if (info > 0)
+			{
+				return info;
+			}
+			info = LAPACKE_dgetri(LAPACK_ROW_MAJOR, n, A, lda, ipiv);
+		}
+		else
+		{
+			info = LAPACKE_dgetrf(LAPACK_COL_MAJOR, n, n, A, n, ipiv);
+			if (info > 0)
+			{
+				return info;
+			}
+			info = LAPACKE_dgetri(LAPACK_COL_MAJOR, n, A, lda, ipiv);
+		}
+		free(ipiv);
+		return info;
 	}
 
 	//Util

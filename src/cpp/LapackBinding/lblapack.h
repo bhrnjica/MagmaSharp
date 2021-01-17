@@ -69,9 +69,15 @@ namespace LapackBinding
 	extern "C" MAGMABINDINGS_API int mbv2dgeevs_cpu(bool rowmajor, int n, double* A, int lda, double* wr, double* wi, double* VL, bool computeLeft, double* VR, bool computeRight);
 	extern "C" MAGMABINDINGS_API int mbv2dgeev_cpu(bool rowmajor, char jobvl, char jobvr, int n, double* A, int lda, double* wr, double* wi, double* Vl, int ldvl, double* Vr, int ldvr);
 
-	//Matrix-Matrix operations
-	extern "C" MAGMABINDINGS_API void mbv2sgemm_cpu(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc);
-	extern "C" MAGMABINDINGS_API void mbv2dgemm_cpu(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc);
+	//Matrix-Matrix multiplication
+	extern "C" MAGMABINDINGS_API void mbv2sgemm_cpu(bool rowmajor, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc);
+	extern "C" MAGMABINDINGS_API void mbv2dgemm_cpu(bool rowmajor, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc);
+
+	//Transpose 
 	extern "C" MAGMABINDINGS_API void mbv2stranspose_cpu(bool rowmajor, int m, int n, const float* A, int lda, float* At, int ldat);
 	extern "C" MAGMABINDINGS_API void mbv2dtranspose_cpu(bool rowmajor, int m, int n, const double* A, int lda, double* At, int ldat);
+
+	//Inverse matrix
+	extern "C" MAGMABINDINGS_API int mbv2dinverse_cpu(bool rowmajor, int n, double* A, int lda);
+	extern "C" MAGMABINDINGS_API int mbv2sinverse_cpu(bool rowmajor, int n, float* A, int lda);
 }

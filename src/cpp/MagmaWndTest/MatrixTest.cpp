@@ -70,6 +70,7 @@ void mv2sgemm_test_magma_row()
 {
 	const float alpha = 1.0f, beta = 1.0f;
 	const int m = 6, n = 4, k = 5;
+
 	//with rowmajor layout leading dimension of the matrix is column number.
 	//const int lda = k, ldb = n, ldc = n;
 	const int lda = m, ldb = k, ldc = m;
@@ -260,7 +261,7 @@ void mv2sgemm_test_lapack_col()
 	   0, 0, 0, 0,
 	};
 
-	mbv2sgemm_cpu(false, mbv2trans::NoTrans, mbv2trans::NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+	mbv2sgemm_cpu(false, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 
 	assert(225.45f == round_up(C[0], 2));
 	assert(0.45f == round_up(C[1], 2));
@@ -307,7 +308,7 @@ void mv2sgemm_test_lapack_row()
 	   0, 0, 0, 0,
 	};
 
-	mbv2sgemm_cpu(true, mbv2trans::NoTrans, mbv2trans::NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+	mbv2sgemm_cpu(true, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 
 
 	print_matrix((char*)"Matrix mult result:", m, n, C, ldc, false);
@@ -360,7 +361,7 @@ void mv2sgemm_test_lapack_col_01()
 	   1.7f,3.5f,3.3f,2.2f,2.4f,4.4
 	};
 
-	mbv2sgemm_cpu(false, mbv2trans::NoTrans, mbv2trans::NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+	mbv2sgemm_cpu(false, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 
 	print_matrix((char*)"Matrix mult result:", m, n, C, lda);
 
@@ -408,7 +409,7 @@ void mv2sgemm_test_lapack_row_01()
 
 	};
 
-	mbv2sgemm_cpu(true, mbv2trans::NoTrans, mbv2trans::NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+	mbv2sgemm_cpu(true, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 
 	print_matrix((char*)"Matrix mult result:", m, n, C, ldc, false);
 
@@ -677,7 +678,7 @@ void mv2dgemm_test_lapack_col()
 	   0, 0, 0, 0,
 	};
 
-	mbv2dgemm_cpu(false, mbv2trans::NoTrans, mbv2trans::NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+	mbv2dgemm_cpu(false,  m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 
 	assert(225.45 == round_up(C[0], 2));
 	assert(0.45 == round_up(C[1], 2));
@@ -724,7 +725,7 @@ void mv2dgemm_test_lapack_row()
 	   0, 0, 0, 0,
 	};
 
-	mbv2dgemm_cpu(true, mbv2trans::NoTrans, mbv2trans::NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+	mbv2dgemm_cpu(true,  m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 
 
 	print_matrix((char*)"Matrix mult result:", m, n, C, ldc, false);
@@ -777,7 +778,7 @@ void mv2dgemm_test_lapack_col_01()
 	   1.7f,3.5f,3.3f,2.2f,2.4f,4.4
 	};
 
-	mbv2dgemm_cpu(false, mbv2trans::NoTrans, mbv2trans::NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+	mbv2dgemm_cpu(false,  m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 
 	print_matrix((char*)"Matrix mult result:", m, n, C, lda);
 
@@ -825,7 +826,7 @@ void mv2dgemm_test_lapack_row_01()
 
 	};
 
-	mbv2dgemm_cpu(true, mbv2trans::NoTrans, mbv2trans::NoTrans, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+	mbv2dgemm_cpu(true, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 
 	print_matrix((char*)"Matrix mult result:", m, n, C, ldc, false);
 

@@ -9,6 +9,18 @@ namespace MagmaSharp.TestApp
         static void Main(string[] args)
         {
 
+            //Matrix A
+            var A = new double[4, 4]// { { 3, 3.2 }, { 3.5, 3.6 } };
+
+                {
+                { 1, 2, 3, 4},
+                { 2, 2, 5, 4},
+                { 3, 2, 6, 4},
+                { 5, 5, 3, 4} };
+
+
+            var C = LapackSharp.LinAlg.MInverse(A);
+
 
             PerformanceTest.SVD();
             return;

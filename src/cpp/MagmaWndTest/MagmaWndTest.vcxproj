@@ -180,9 +180,6 @@ copy /Y "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\red
     <ClInclude Include="SVDTests.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\LapackBinding\LapackBinding.vcxproj">
       <Project>{6f92d549-54a9-4950-84c7-bfbcc349735e}</Project>
     </ProjectReference>
@@ -190,10 +187,21 @@ copy /Y "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\red
       <Project>{47af221e-5578-49fe-a144-b51b1117c894}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\..\packages\intelmkl.redist.win-x64.2020.2.254\build\native\intelmkl.redist.win-x64.targets" Condition="Exists('..\packages\intelmkl.redist.win-x64.2020.2.254\build\native\intelmkl.redist.win-x64.targets')" />
+    <Import Project="..\..\..\packages\intelmkl.redist.win-x64.2020.2.254\build\native\intelmkl.redist.win-x64.targets" Condition="Exists('..\..\..\packages\intelmkl.redist.win-x64.2020.2.254\build\native\intelmkl.redist.win-x64.targets')" />
     <Import Project="..\..\..\packages\intelopenmp.redist.win.2020.2.254\build\native\intelopenmp.redist.win.targets" Condition="Exists('..\..\..\packages\intelopenmp.redist.win.2020.2.254\build\native\intelopenmp.redist.win.targets')" />
     <Import Project="..\..\..\packages\inteltbb.redist.win.2020.3.254\build\native\inteltbb.redist.win.targets" Condition="Exists('..\..\..\packages\inteltbb.redist.win.2020.3.254\build\native\inteltbb.redist.win.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\..\packages\intelmkl.redist.win-x64.2020.2.254\build\native\intelmkl.redist.win-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\intelmkl.redist.win-x64.2020.2.254\build\native\intelmkl.redist.win-x64.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\intelopenmp.redist.win.2020.2.254\build\native\intelopenmp.redist.win.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\intelopenmp.redist.win.2020.2.254\build\native\intelopenmp.redist.win.targets'))" />
+    <Error Condition="!Exists('..\..\..\packages\inteltbb.redist.win.2020.3.254\build\native\inteltbb.redist.win.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\inteltbb.redist.win.2020.3.254\build\native\inteltbb.redist.win.targets'))" />
+  </Target>
 </Project>

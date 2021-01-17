@@ -59,5 +59,9 @@ namespace MagmaBinding
 	extern "C" MAGMABINDINGS_API void mbv2sgemm(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, float alpha, const float* A, int lda, const float* B, int ldb, float beta, float* C, int ldc);
 	extern "C" MAGMABINDINGS_API void mbv2dgemm(bool rowmajor, mbv2trans opA, mbv2trans opB, int m, int n, int k, double alpha, const double* A, int lda, const double* B, int ldb, double beta, double* C, int ldc);
 
-
+	//Inversion Matrix
+	extern "C" MAGMABINDINGS_API int mbv2sgetri_gpu(bool rowmajor, int n, float* dA, int ldda);
+	extern "C" MAGMABINDINGS_API int mbv2sgetri(bool rowmajor, int n, float* dA, int ldda);
+	extern "C" MAGMABINDINGS_API int mbv2dgetri_gpu(bool rowmajor, int n, double* dA, int ldda);
+	extern "C" MAGMABINDINGS_API int mbv2dgetri(bool rowmajor, int n, double* dA, int ldda);
 }
