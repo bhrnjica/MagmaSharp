@@ -162,8 +162,8 @@ namespace MagmaSharp.XUnit
 
             var X = MagmaSharp.LinAlg.Lss(A, B, Device.CPU);
 
-            Assert.Equal(3.5f, X[0,1]);
-            Assert.Equal(1.4f, X[1, 0]);
+            Assert.Equal(3.5, Math.Round(X[0,0],2));
+            Assert.Equal(1.4, Math.Round(X[1, 0],2));
         }
     }
 }

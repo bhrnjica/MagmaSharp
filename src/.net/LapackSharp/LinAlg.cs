@@ -356,7 +356,7 @@ namespace LapackSharp
             int m = A.GetLength(0);
             int k = A.GetLength(1);
             int n = B.GetLength(1);
-            if (C.GetLength(0) != m || C.GetLength(1) != n)
+            if (C != null && (C.GetLength(0) != m || C.GetLength(1) != n))
                 throw new Exception($"C matrix has wrong format. The format should be ({m},{n})");
             //const int lda = k, ldb = n, ldc = n;
 

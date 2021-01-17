@@ -73,13 +73,13 @@ namespace MagmaSharp.XUnit
                 {6,   7,   8,   9,   10 },
                 { 11,  12,  13,  14,  15 }
                  };
-            var B = new double[5, 2]
+            var B = new double[5, 3]
                 {
-                    {1,2 },
-                    {3,4 },
-                    {5,6 },
-                    {7,8 },
-                    {9,10}
+                    {1,2,5 },
+                    {3,4,7 },
+                    {5,6,4 },
+                    {7,8,1 },
+                    {9,10,15}
                 };
 
             var C = LapackSharp.LinAlg.MMult(A, B);
