@@ -44,9 +44,9 @@ namespace LapackBinding
 	void transpose(const double* src, double* dst, const int N, const int M);
 
 	//AX=B - solver
-	extern "C" MAGMABINDINGS_API int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int ldb);
+	extern "C" MAGMABINDINGS_API int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, float* B, int ldb);
 	//double
-	extern "C" MAGMABINDINGS_API int mbv2dgesv_cpu(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int ldb);
+	extern "C" MAGMABINDINGS_API int mbv2dgesv_cpu(bool rowmajor, int n, int nrhs, double* A, int lda,  double* B, int ldb);
 	
 	//SVD
 	extern "C" MAGMABINDINGS_API int mbv2sgesvd_cpu(bool rowmajor, mbv2vector jobu, mbv2vector jobv, int m, int n, float* A, int lda, float* s, float* U, int ldu, float* VT, int ldvt);

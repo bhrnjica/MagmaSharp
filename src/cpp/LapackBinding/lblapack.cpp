@@ -10,24 +10,30 @@ namespace LapackBinding
 {
 	extern void print_matrix(char* desc, int m, int n, float* a, const int lda);
 	
-	int mbv2dgesv_cpu(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int ldb)
+	int mbv2dgesv_cpu(bool rowmajor, int n, int nrhs, double* A, int lda,  double* B, int ldb)
 	{
 		int info;
+		int* ipiv = (int*)malloc(n * sizeof(int));
 		if (rowmajor)
-			info = info = LAPACKE_dgesv(LAPACK_ROW_MAJOR, n, nrhs, A, lda, ipiv, B, ldb);
+			info = LAPACKE_dgesv(LAPACK_ROW_MAJOR, n, nrhs, A, lda, ipiv, B, ldb);
 		else
-			info = info = LAPACKE_dgesv(LAPACK_COL_MAJOR, n, nrhs, A, lda, ipiv, B, ldb);
+			info = LAPACKE_dgesv(LAPACK_COL_MAJOR, n, nrhs, A, lda, ipiv, B, ldb);
+
+		free(ipiv);
 		return info;
 
 	}
 
-	int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int ldb)
+	int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, float* B, int ldb)
 	{
 		int info;
+		int* ipiv = (int*)malloc(n * sizeof(int));
 		if(rowmajor)
 			info = LAPACKE_sgesv(LAPACK_ROW_MAJOR, n, nrhs, A, lda, ipiv, B, ldb);
 		else
 			info = LAPACKE_sgesv(LAPACK_COL_MAJOR, n, nrhs, A, lda, ipiv, B, ldb);
+
+		free(ipiv);
 		return info;
 
 	}

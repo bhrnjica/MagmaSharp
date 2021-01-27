@@ -47,21 +47,21 @@ namespace MagmaSharp
         #region Solver- solver of system of linear equations
         // 
         [DllImport("LapackBinding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int lbd);
+        private static extern int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, float* B, int lbd);
 
         [DllImport("Magmav2Binding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2sgesv(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B,int lbd);
+        private static extern int mbv2sgesv(bool rowmajor, int n, int nrhs, float* A, int lda, float* B,int lbd);
 
         [DllImport("Magmav2Binding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2sgesv_gpu(bool rowmajor, int n, int nrhs, float* A, int ldda, int* ipiv, float* B, int lddb);
+        private static extern int mbv2sgesv_gpu(bool rowmajor, int n, int nrhs, float* A, int ldda, float* B, int lddb);
 
         //double
         [DllImport("LapackBinding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2dgesv_cpu(bool rowmajor, int n, int nrhs, double* A, int ldda, int* ipiv, double* B, int lddb);
+        private static extern int mbv2dgesv_cpu(bool rowmajor, int n, int nrhs, double* A, int ldda, double* B, int lddb);
         [DllImport("Magmav2Binding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2dgesv(bool rowmajor, int n, int nrhs, double* A, int ldda, int* ipiv, double* B, int lddb);
+        private static extern int mbv2dgesv(bool rowmajor, int n, int nrhs, double* A, int ldda, double* B, int lddb);
         [DllImport("Magmav2Binding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2dgesv_gpu(bool rowmajor, int n, int nrhs, double* A, int ldda, int* ipiv, double* B, int lddb);
+        private static extern int mbv2dgesv_gpu(bool rowmajor, int n, int nrhs, double* A, int ldda, double* B, int lddb);
 
         public static float[,] Solve(float[,] A, float[,] B, Device device = Device.DEFAULT)
         {
@@ -73,20 +73,15 @@ namespace MagmaSharp
             var Bc = B.Clone() as float[,];
 
             //define arrays
-            int[] ipiv = new int[n];//permutation indices
             fixed(float *pA = Ac, pB = Bc)
             {
-                fixed(int* pipiv = ipiv)
-                {
-                    //pInvoke call
-                    if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
-                        info = mbv2sgesv_gpu(true, n, nrhs, pA, n, pipiv, pB, n);
-                    else if (device == Device.CPU && _device == Device.GPU)
-                        info = mbv2sgesv(true, n, nrhs, pA, n, pipiv, pB, n);
-                    else
-                        info = mbv2sgesv_cpu(true, n, nrhs, pA, n, pipiv, pB, nrhs);
-                }
-
+                //pInvoke call
+                if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
+                    info = mbv2sgesv_gpu(true, n, nrhs, pA, n, pB, n);
+                else if (device == Device.CPU && _device == Device.GPU)
+                    info = mbv2sgesv(true, n, nrhs, pA, n, pB, n);
+                else
+                    info = mbv2sgesv_cpu(true, n, nrhs, pA, n, pB, nrhs);
             }
             //
             if (info != 0)
@@ -111,20 +106,15 @@ namespace MagmaSharp
             var Ac = A.Clone() as double[,];
             var Bc = B.Clone() as double[,];
             //define arrays
-            int[] ipiv = new int[n];//permutation indices
             fixed (double* pA = Ac, pB = Bc)
             {
-                fixed (int* pipiv = ipiv)
-                {
-                    //pInvoke call
-                    if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
-                        info = mbv2dgesv_gpu(true, n, nrhs, pA, n, pipiv, pB, n);
-                    else if (device == Device.CPU && _device == Device.GPU)
-                        info = mbv2dgesv(true, n, nrhs, pA, n, pipiv, pB, n);
-                    else
-                        info = mbv2dgesv_cpu(true, n, nrhs, pA, n, pipiv, pB, nrhs);
-                }
-
+                //pInvoke call
+                if ((device == Device.DEFAULT || device == Device.GPU) && _device == Device.GPU)
+                    info = mbv2dgesv_gpu(true, n, nrhs, pA, n, pB, n);
+                else if (device == Device.CPU && _device == Device.GPU)
+                    info = mbv2dgesv(true, n, nrhs, pA, n, pB, n);
+                else
+                    info = mbv2dgesv_cpu(true, n, nrhs, pA, n, pB, nrhs);
             }
             //
             if (info != 0)

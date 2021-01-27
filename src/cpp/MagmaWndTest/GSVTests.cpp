@@ -49,7 +49,7 @@ void mv2dgesv_test()
 	printf("mbv2dgesv test\n");
 
 	/* Solve the equations A*X = B */
-	info = mbv2dgesv(false,n, nrhs, A, lda, ipiv, B, ldb);
+	info = mbv2dgesv(false,n, nrhs, A, lda,  B, ldb);
 
 	/* Check for the exact singularity */
 	if (info > 0) {
@@ -124,7 +124,7 @@ void mv2dgesv_cpu_test()
 	printf("mbv2dgesv_cpu test\n");
 
 	/* Solve the equations A*X = B */
-	info = mbv2dgesv_cpu(false, n, nrhs, A, lda, ipiv, B, ldb);
+	info = mbv2dgesv_cpu(false, n, nrhs, A, lda, B, ldb);
 
 	/* Check for the exact singularity */
 	if (info > 0) {
@@ -201,7 +201,7 @@ void mv2dgesv_gpu_test()
 	printf("mbv2dgesv_gpu test\n");
 
 	/* Solve the equations A*X = B */
-	info = mbv2dgesv_gpu(false, n, nrhs, A, lda, ipiv, B, ldb);
+	info = mbv2dgesv_gpu(false, n, nrhs, A, lda,  B, ldb);
 
 	/* Check for the exact singularity */
 	if (info > 0) {
@@ -278,7 +278,7 @@ void mv2sgesv_test()
 	printf("mbv2sgesv test\n");
 
 	/* Solve the equations A*X = B */
-	info = mbv2sgesv(false, n, nrhs, A, lda, ipiv, B, ldb);
+	info = mbv2sgesv(false, n, nrhs, A, lda,  B, ldb);
 
 	/* Check for the exact singularity */
 	if (info > 0) {
@@ -353,7 +353,7 @@ void mv2sgesv_cpu_test()
 	printf("mbv2sgesv_cpu test\n");
 
 	/* Solve the equations A*X = B */
-	info = mbv2sgesv_cpu(false, n, nrhs, A, lda, ipiv, B, ldb);
+	info = mbv2sgesv_cpu(false, n, nrhs, A, lda,  B, ldb);
 
 	/* Check for the exact singularity */
 	if (info > 0) {
@@ -429,7 +429,7 @@ void mv2sgesv_gpu_test()
 	printf("mbv2sgesv_gpu test\n");
 
 	/* Solve the equations A*X = B */
-	info = mbv2sgesv_gpu(false, n, nrhs, A, lda, ipiv, B, ldb);
+	info = mbv2sgesv_gpu(false, n, nrhs, A, lda,  B, ldb);
 
 	/* Check for the exact singularity */
 	if (info > 0) {

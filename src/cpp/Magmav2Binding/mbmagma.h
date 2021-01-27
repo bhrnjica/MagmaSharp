@@ -26,11 +26,11 @@ namespace MagmaBinding
 	
 	
 	//AX=B - solver
-	extern "C" MAGMABINDINGS_API int mbv2sgesv(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int ldb);
-	extern "C" MAGMABINDINGS_API int mbv2sgesv_gpu(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2sgesv(bool rowmajor, int n, int nrhs, float* A, int lda, float* B, int ldb);
+	extern "C" MAGMABINDINGS_API int mbv2sgesv_gpu(bool rowmajor, int n, int nrhs, float* A, int lda,  float* B, int lbd);
 	//double
-	extern "C" MAGMABINDINGS_API int mbv2dgesv(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int lbd);
-	extern "C" MAGMABINDINGS_API int mbv2dgesv_gpu(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2dgesv(bool rowmajor, int n, int nrhs, double* A, int lda,  double* B, int lbd);
+	extern "C" MAGMABINDINGS_API int mbv2dgesv_gpu(bool rowmajor, int n, int nrhs, double* A, int lda, double* B, int lbd);
 
 	//SVD
 	extern "C" MAGMABINDINGS_API int mbv2sgesvds(bool rowmajor, int m, int n, float* A, float* s, float* U, bool calcU, float* VT, bool calcV);

@@ -19,13 +19,13 @@ namespace MagmaBinding
 	extern void reverseVector(float* arr, int start, int end);
 	extern void reverseVector(double* arr, int start, int end);
 	
-	int mbv2dgesv(bool rowmajor, int n, int nrhs, double* A, int lda, int* ipiv, double* B, int ldb)
+	int mbv2dgesv(bool rowmajor, int n, int nrhs, double* A, int lda, double* B, int ldb)
 	{
 		magma_init(); // initialize Magma
 
 		int info;
 		double* At = NULL, * Bt = NULL;
-
+		int* ipiv = (int*)malloc(n * sizeof(int));
 		if (rowmajor)
 		{
 			magma_dmalloc_pinned(&At, (const int)(lda * n));
@@ -48,12 +48,12 @@ namespace MagmaBinding
 		magma_free_pinned(Bt);
 
 		magma_finalize(); // finalize Magma
-
+		free(ipiv);
 		return info;
 	}
 
 	
-	int mbv2dgesv_gpu(bool rowmajor, int n, int nrhs, double* A, int ldda, int* ipiv, double* B, int lddb)
+	int mbv2dgesv_gpu(bool rowmajor, int n, int nrhs, double* A, int ldda, double* B, int lddb)
 	{
 		magma_init();
 
@@ -68,6 +68,7 @@ namespace MagmaBinding
 
 		/* Copy matrix C from the CPU to the GPU */
 		double* dA, * dX, * At = NULL, * Bt = NULL;
+		int* ipiv = (int*)malloc(n * sizeof(int));
 		if (rowmajor)
 		{
 			magma_dmalloc_pinned(&At, (const int)(nxn));
@@ -120,17 +121,18 @@ namespace MagmaBinding
 		magma_free_pinned(Bt);
 		magma_queue_destroy(queue); // destroy queue
 		magma_finalize();
+		free(ipiv);
 		return 0;
 	}
 
 	
-	int mbv2sgesv(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int ldb)
+	int mbv2sgesv(bool rowmajor, int n, int nrhs, float* A, int lda, float* B, int ldb)
 	{
 		magma_init(); // initialize Magma
 		
 		int info;
 		float * At = NULL, *Bt = NULL;
-
+		int* ipiv = (int*)malloc(n * sizeof(int));
 		if (rowmajor)
 		{
 			magma_smalloc_pinned(&At, (const int)(lda * n));
@@ -153,11 +155,12 @@ namespace MagmaBinding
 		magma_free_pinned(Bt);
 
 		magma_finalize(); // finalize Magma
+		free(ipiv);
 
 		return info;
 	}
 
-	int mbv2sgesv_gpu(bool rowmajor, int n, int nrhs, float* A, int ldda, int* ipiv, float* B, int lddb)
+	int mbv2sgesv_gpu(bool rowmajor, int n, int nrhs, float* A, int ldda, float* B, int lddb)
 	{
 		magma_init();
 
@@ -172,6 +175,7 @@ namespace MagmaBinding
 
 		/* Copy matrix C from the CPU to the GPU */
 		float* dA, * dX, *At = NULL, * Bt = NULL;
+		int* ipiv = (int*)malloc(n * sizeof(int));
 		if (rowmajor)
 		{
 			magma_smalloc_pinned(&At, (const int)(nxn));
@@ -224,6 +228,7 @@ namespace MagmaBinding
 		magma_free_pinned(Bt);
 		magma_queue_destroy(queue); // destroy queue
 		magma_finalize();
+		free(ipiv);
 		return 0;
 	}
 

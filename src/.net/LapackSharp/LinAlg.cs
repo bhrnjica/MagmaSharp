@@ -18,13 +18,18 @@ namespace LapackSharp
         #region Solver- solver of system of linear equations
         // 
         [DllImport("LapackBinding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, int* ipiv, float* B, int lbd);
+        private static extern int mbv2sgesv_cpu(bool rowmajor, int n, int nrhs, float* A, int lda, float* B, int lbd);
 
         //double
         [DllImport("LapackBinding.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int mbv2dgesv_cpu(bool rowmajor, int n, int nrhs, double* A, int ldda, int* ipiv, double* B, int lddb);
+        private static extern int mbv2dgesv_cpu(bool rowmajor, int n, int nrhs, double* A, int ldda, double* B, int lddb);
        
-
+        /// <summary>
+        /// Sole system of Linear equation A X=B
+        /// </summary>
+        /// <param name="A">Matrix of the system</param>
+        /// <param name="B">Right matrix</param>
+        /// <returns></returns>
         public static float[,] Solve(float[,] A, float[,] B)
         {
             //define parameters
@@ -35,19 +40,43 @@ namespace LapackSharp
             var Bc = B.Clone() as float[,];
 
             //define arrays
-            int[] ipiv = new int[n];//permutation indices
             fixed(float *pA = Ac, pB = Bc)
             {
-                fixed(int* pipiv = ipiv)
-                {
-                    //pInvoke call
-                    info = mbv2sgesv_cpu(true, n, nrhs, pA, n, pipiv, pB, nrhs);
-                }
-
+                //pInvoke call
+                info = mbv2sgesv_cpu(true, n, nrhs, pA, n, pB, nrhs);
             }
             //
             if (info != 0)
                 throw new Exception($"lapack_sgesv failed due to invalid parameter {-info}.");
+
+            //
+            return Bc;
+        }
+
+        /// <summary>
+        /// Solve linear system of equations A X = B.
+        /// </summary>
+        /// <param name="A"></param>
+        /// <param name="B"></param>
+        /// <returns>X - solution matrix</returns>
+        public static float[] Solve(float[,] A, float[] B)
+        {
+            //define parameters
+            int info = -1;
+            int n = A.GetLength(0);
+            int nrhs = 1;
+            var Ac = A.Clone() as float[,];
+            var Bc = B.Clone() as float[];
+            //define arrays
+            int[] ipiv = new int[n];//permutation indices
+            fixed (float* pA = Ac, pB = Bc)
+            {
+                //pInvoke call
+                info = mbv2sgesv_cpu(true, n, nrhs, pA, n, pB, nrhs);
+            }
+            //
+            if (info != 0)
+                throw new Exception($"magma_sgesv failed due to invalid parameter {-info}.");
 
             //
             return Bc;
@@ -68,15 +97,38 @@ namespace LapackSharp
             var Ac = A.Clone() as double[,];
             var Bc = B.Clone() as double[,];
             //define arrays
-            int[] ipiv = new int[n];//permutation indices
             fixed (double* pA = Ac, pB = Bc)
             {
-                fixed (int* pipiv = ipiv)
-                {
-                    //pInvoke call
-                    info = mbv2dgesv_cpu(true, n, nrhs, pA, n, pipiv, pB, nrhs);
-                }
+                //pInvoke call
+                info = mbv2dgesv_cpu(true, n, nrhs, pA, n, pB, nrhs);
+            }
+            //
+            if (info != 0)
+                throw new Exception($"magma_sgesv failed due to invalid parameter {-info}.");
 
+            //
+            return Bc;
+        }
+
+        /// <summary>
+        /// Solve linear system of equations A X = B.
+        /// </summary>
+        /// <param name="A"></param>
+        /// <param name="B"></param>
+        /// <returns>X - solution matrix</returns>
+        public static double[] Solve(double[,] A, double[] B)
+        {
+            //define parameters
+            int info = -1;
+            int n = A.GetLength(0);
+            int nrhs = 1;
+            var Ac = A.Clone() as double[,];
+            var Bc = B.Clone() as double[];
+            //define arrays
+            fixed (double* pA = Ac, pB = Bc)
+            {
+                //pInvoke call
+                info = mbv2dgesv_cpu(true, n, nrhs, pA, n, pB, nrhs);
             }
             //
             if (info != 0)
@@ -439,15 +491,11 @@ namespace LapackSharp
             var Ac = A.Clone() as float[,];
 
             //define arrays
-            int[] ipiv = new int[n]; 
+ 
             fixed (float* pA = Ac)
             {
-                fixed (int* pipiv = ipiv)
-                {
-                    //pInvoke call
-                    info = mbv2sinverse_cpu(true, n, pA, n);
-                }
-
+                //pInvoke call
+                info = mbv2sinverse_cpu(true, n, pA, n);
             }
             //
             if (info != 0)

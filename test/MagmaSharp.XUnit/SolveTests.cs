@@ -222,5 +222,51 @@ namespace MagmaSharp.XUnit
 
 
         }
+
+
+        [Fact]
+        public void Test1Double()
+        {
+            
+            double[,] A = new double[3, 3]
+                {
+                {2.0, 3.0, 5.0},
+                {3.0, 5.0, 2.0},
+                {5.0, 4.0, 4.0},
+                };
+
+            ///
+            double[] B = new double[3]{ 21.0,22.0,25.0};
+
+            var result = LapackSharp.LinAlg.Solve(A,B);
+            var expected = new double[3] { 1f, 3f, 2f };
+
+            for (int j = 0; j < result.Length; j++)
+            {
+                Assert.Equal(expected[j], result[j], 2);
+            }
+        }
+        [Fact]
+        public void Test1fLOAT()
+        {
+
+            float[,] A = new float[3, 3]
+                {
+                {2.0F, 3.0F, 5.0F},
+                {3.0F, 5.0F, 2.0F},
+                {5.0F, 4.0F, 4.0F},
+                };
+
+            ///
+            float[] B = new float[3] { 21.0F, 22.0F, 25.0F };
+
+            var result = LapackSharp.LinAlg.Solve(A, B);
+            var expected = new float[3] { 1f, 3f, 2f };
+
+            for (int j = 0; j < result.Length; j++)
+            {
+                Assert.Equal(expected[j], result[j], 2);
+            }
+        }
     }
 }
