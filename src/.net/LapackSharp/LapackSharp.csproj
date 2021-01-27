@@ -20,6 +20,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>C:\sc\github\MagmaSharp\src\.net\LapackSharp\LapackSharp.xml</DocumentationFile>
   </PropertyGroup>
 
 </Project>
